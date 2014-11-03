@@ -1,0 +1,85 @@
+{% extends 'oars_auth/base.html' %}
+
+{% block extrastyle %}
+    <style type="text/css">
+        form fieldset {
+            padding: 10px 25px 25px 25px;
+            border: 1px solid #cccccc;
+            border-radius: 10px;
+            background-color: #e0e0e0;
+        }
+        form fieldset h2 span,p span.link {
+            background-color: #e0e0e0;
+            color: #038cd0;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger">{{ error|escape }}</div>
+    {% endfor %}
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">{{ error|escape }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2">
+        <form role="form" name="{% block form_name %}{% endblock %}" autocapitalize="off" action="{% block form_action %}{% endblock %}" method="post">
+            <fieldset>
+
+                <div>
+                    <h2 class="text-center">
+                        {% block form_heading %}{% endblock %}
+                    </h2>
+                </div>
+                <hr>
+
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="fieldWrapper form-group">
+                        <div class="input-group">
+                            {% if field.html_name == 'username' %}
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                                <input type="text" name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="form-control input-lg" placeholder="{{ field.label }}" required>
+                            {% elif field.html_name == 'email' %}
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                                <input type="email" name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="form-control input-lg" placeholder="{{ field.label }}" required>
+                            {% else %}
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                <input type="password" name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="form-control input-lg" placeholder="{{ field.label }}" required>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        {% block form_submit %}{% endblock %}
+                    </div>
+                </div>
+
+                {% block form_extra_wrapper %}
+                <div class="row form-extra">
+                    <div class="col-xs-12">
+                        {% block form_extra %}{% endblock %}
+                    </div>
+                </div>
+                {% endblock %}
+
+            </fieldset>
+        </form>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+Data model for the app
+----------------------
+
+=> change auth app
+    - add a field user_type (IntegerField) (enum type)
+    - authentication using user_type, username, password
+
+model Dept:
+    - id (automatic)
+    - code (CharField(max_length=5))
+    - name (CharField(max_length=25))
+
+model Student:
+    - id (automatic)
+    - user (OneToOneField(User))
+    - dept (ForeignKey(Dept))
+    - semester (IntegerField)
+    - cpi (DecimalField)
+    - current_courses (ManyToManyField(Course))
+
+model Professor:
+    - id (automatic)
+    - user (OneToOneField(User))
+    - dept (ForeignKey)
+
+model DUGC:
+    - id (automatic)
+    - dept (ForeignKey(Dept))
+    - professor (ForeignKey(Professor))
+
+model CourseType:
+    - id (automatic)
+    - code (CharField(max_length=5))
+
+model Course:
+    - id (automatic)
+    - dept (ForeignKey(Dept))
+   *- type (ForeignKey(CourseType)) (ex. CS, ESO, etc. )
+    - code (CharField(max_length=8))
+    - name (CharField(max_length=50))
+    - professors (ManyToManyField(Professor))
+    - prerequisites (ManyToManyField(Course))
+    - is_offered (BooleanField)
+   *- credits (IntegerField) (format: [L][T][P])
+    - schedule (CommaSeparatedIntegerField) (format: [type = 1(L) | 2(T) | 3(P)][day = 01 | 02 | 04 | 08 |16][start_time = 24-hour clock time][2*duration])
+    - description (TextField)
+    - notes (CharField(max_length=100))
+
+model Request:
+    - id (automatic)
+    - course (Course)
+    - student (Student)
+    - status (IntegerField) (!!to be decided options: waiting, accepted, rejected)
+
+model PreviousCourses:
+    - id (automatic)
+    - course (ForeignKey(Course))
+    - student (ForeignKey(Student))
+    - semester (IntegerField)
+    - grade (IntegerField)

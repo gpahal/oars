@@ -1,0 +1,17 @@
+{% extends 'oars_auth/base.html' %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+    <div class="bs-callout bs-callout-{% block message_type %}primary{% endblock %}">
+        <h3>
+            <strong>{% block message_heading %}{% endblock %}</strong>
+        </h3>
+
+        <hr>
+
+        {% block message %}{% endblock %}
+    </div>
+
+{% endblock %}

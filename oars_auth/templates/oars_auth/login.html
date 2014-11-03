@@ -1,0 +1,17 @@
+{% extends 'oars_auth/form_base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block form_name %}login_form{% endblock %}
+
+{% block form_action %}{% url "login" %}{% endblock %}
+
+{% block form_heading %}Login{% endblock %}
+
+{% block form_submit %}
+    <input type="submit" name="login" class="btn btn-lg btn-success btn-block" value="Login">
+{% endblock %}
+
+{% block form_extra %}
+    <p><span class="link"><a href="{% url "password_reset" %}" target="_self">Forgot password?</a></span></p>
+{% endblock %}
