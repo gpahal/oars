@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}{% endblock %}
+
+{% block extrastyle %}
+    <style>
+        .bs-callout {
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #eee;
+            border-left-width: 5px;
+            border-radius: 3px;
+            background-color: #e9e9e9;
+        }
+        .bs-callout h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .bs-callout p:last-child {
+            margin-bottom: 0;
+        }
+        .bs-callout code {
+            border-radius: 3px;
+        }
+        .bs-callout+.bs-callout {
+            margin-top: -5px;
+        }
+        .bs-callout-default {
+            border-left-color: #777;
+        }
+        .bs-callout-default h3 {
+            color: #777;
+        }
+        .bs-callout-primary {
+            border-left-color: #428bca;
+        }
+        .bs-callout-primary h3 {
+            color: #428bca;
+        }
+        .bs-callout-success {
+            border-left-color: #5cb85c;
+        }
+        .bs-callout-success h3 {
+            color: #5cb85c;
+        }
+        .bs-callout-danger {
+            border-left-color: #d9534f;
+        }
+        .bs-callout-danger h3 {
+            color: #d9534f;
+        }
+        .bs-callout-warning {
+            border-left-color: #f0ad4e;
+        }
+        .bs-callout-warning h3 {
+            color: #f0ad4e;
+        }
+        .bs-callout-info {
+            border-left-color: #5bc0de;
+        }
+        .bs-callout-info h3 {
+            color: #5bc0de;
+        }
+        .message {
+            font-size: 1.3em;
+        }
+        hr {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            border-width: 2px 0;
+            border-radius: 2px;
+            border-color: #c0c0c0;
+        }
+        .btn {
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+{% endblock %}
+
+{% block fa-icon %}{% endblock %}
+
+{% block menu-item %}{% endblock %}
+
+{% block content %}
+
+    <div class="col-xs-12 col-md-8 col-md-offset-2">
+        <div class="bs-callout bs-callout-{% block message_type %}primary{% endblock %}">
+            <h3>
+                <strong>{% block message_heading %}{% endblock %}</strong>
+            </h3>
+
+            <hr>
+
+            <div class="message">
+                {% block message %}{% endblock %}
+            </div>
+        </div>
+
+{% endblock %}

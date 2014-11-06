@@ -6,17 +6,19 @@ This project is built using the [*Django framework*](https://www.djangoproject.c
 
 ## Setup
 
-1. Install Python 3.3 or 3.4
+1. Install Python 3.x
 2. Install Django 1.7
 3. Download the code
 4. cd to the project directory
 5. run the following command
+
     ./manage.py runserver
+
 6. Done!
 
 ## Site map
 
-You can now view the website at http://localhost:8000/ (currently there is nothing)
+You can now view the website at [*http://localhost:8000/*](http://localhost:8000/) (currently there is nothing)
 
 URL configuration (path relative to http://localhost:8000):
 

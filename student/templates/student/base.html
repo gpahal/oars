@@ -1,0 +1,29 @@
+{% extends 'common/base.html' %}
+
+{% block department %}{{ user.student.department.name }}{% endblock %}
+
+{% block profile_url %}{% url 'student:profile' %}{% endblock %}
+
+{% block sidebar-menu %}
+    <li class="{% block profile-class %}{% endblock %}">
+        <a href="{% url 'student:profile' %}">
+            <span class="fa fa-user"></span> <span>Profile</span>
+        </a>
+    </li>
+    <li class="{% block request-class %}{% endblock %}">
+        <a href="{% url 'student:profile' %}">
+            <span class="fa fa-check-square"></span> <span>Course Request</span>
+        </a>
+    </li>
+    <li class="treeview {% block courses-class %}{% endblock %}">
+        <a href="#">
+            <span class="fa fa-list"></span>
+            <span>Courses</span>
+            <span class="fa fa-angle-left pull-right"></span>
+        </a>
+        <ul class="treeview-menu">
+            <li class="{% block courses-all-class %}{% endblock %}"><a href="{% url 'student:profile' %}"><span class="fa fa-angle-double-right"></span> All courses</a></li>
+            <li class="{% block course-search-class %}{% endblock %}"><a href="{% url 'student:profile' %}"><span class="fa fa-angle-double-right"></span> Course search</a></li>
+        </ul>
+    </li>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Error 500{% endblock %}
+
+{% block fa-icon %}fa-warning{% endblock %}
+
+{% block menu-item %}Error 500{% endblock %}
+
+{% block heading %}Error 500{% endblock %}
+
+{% block content %}
+    <div class="error-page">
+        <h2 class="headline text-info"> 500</h2>
+        <div class="error-content">
+            <h3><span class="fa fa-warning text-yellow"></span> Internal Server Error</h3>
+            <p>The server encountered an error. Please, try again later.</p>
+            <p><a class="btn btn-flat btn-info" href="{% url 'index' %}">Home</a></p>
+        </div><!-- /.error-content -->
+    </div><!-- /.error-page -->
+{% endblock %}
