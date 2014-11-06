@@ -1,0 +1,74 @@
+{% extends 'student/base.html' %}
+
+{% block title %}Course Search{% endblock %}
+
+{% block heading %}Course Search{% endblock %}
+
+{% block heading-small %}{% endblock %}
+
+{% block relative-address %}
+    <li class="active">Course Search</li>
+{% endblock %}
+
+{% block course-search-class %}active{% endblock %}
+{% block courses-class %}active{% endblock %}
+    
+{% block content %}
+    <div class="box box-solid box-primary">
+        <div class="box-header">
+            <div class="box-title">
+                Search
+            </div>
+            <div class="box-tools pull-right">
+                <button class="btn btn-primary btn-sm" data-widget="collapse"> <span class="fa fa-minus"></span> </button>
+            </div>
+        </div>
+        <div class="box-body">
+            <table class="table table-striped table-responsive">
+                <tbody>
+                    <tr>
+                        <td>
+                            Course Number
+                        </td>
+                        <td>
+                            <input type="text" name="course_num">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Department
+                        </td>
+                        <td>
+                            <input type="text" name="dept">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Title
+                        </td>
+                        <td>
+                            <input type="text" name="course_title">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Instructor
+                        </td>
+                        <td>
+                            <input type="text" name="instructor">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Instructor Email
+                        </td>
+                        <td>
+                            <input type="text" name="instructor_email">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

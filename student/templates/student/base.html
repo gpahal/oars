@@ -22,8 +22,8 @@
             <span class="fa fa-angle-left pull-right"></span>
         </a>
         <ul class="treeview-menu">
-            <li class="{% block courses-all-class %}{% endblock %}"><a href="{% url 'student:profile' %}"><span class="fa fa-angle-double-right"></span> All courses</a></li>
-            <li class="{% block course-search-class %}{% endblock %}"><a href="{% url 'student:profile' %}"><span class="fa fa-angle-double-right"></span> Course search</a></li>
+            <li class="{% block courses-all-class %}{% endblock %}"><a href="{% url 'student:course_listing' %}"><span class="fa fa-angle-double-right"></span> All courses</a></li>
+            <li class="{% block course-search-class %}{% endblock %}"><a href="{% url 'student:course_search' %}"><span class="fa fa-angle-double-right"></span> Course search</a></li>
         </ul>
     </li>
 {% endblock %}

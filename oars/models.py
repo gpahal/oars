@@ -226,8 +226,8 @@ class Course(models.Model):
         validators=[
             validators.RegexValidator(r'^[ \w.@+-]+$', _('Enter a valid course name.'), 'invalid'),
         ])
-    professors = models.ManyToManyField(Professor)
-    prerequisites = models.ManyToManyField("self")
+    professors = models.ManyToManyField(Professor,blank=True)
+    prerequisites = models.ManyToManyField("self",blank=True)
     is_offered = models.BooleanField(default=False)
     credits = models.PositiveSmallIntegerField(
         validators=[
