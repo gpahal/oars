@@ -1,5 +1,7 @@
-from oars.models import Department, CourseType, Course
-
+from oars.models import Department, CourseType, Course, Request
+from django.conf import settings
+from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 def course_listing_context():
 
@@ -56,9 +58,45 @@ def course_request_context(request):
 
     course_types = CourseType.objects.all()
     courses = Course.objects.all()
+
+    if request.method == 'POST':
+        is_new_request_submitted = request.POST.get('course_request', None)
+        is_request_delete_submitted = request.POST.get('request_delete', None)
+    else:
+        is_new_request_submitted = False
+        is_request_delete_submitted = False
+
+    if is_new_request_submitted:
+        course_code = request.POST.get('course_code', None)
+        if course_code:
+            course = Course.objects.get(pk=course_code)
+            request = Request(course=course, student=request.user.student, status=settings.WAITING)
+            request.save()
+        else:
+            raise forms.ValidationError(
+                    _('Invalid value'),
+                    code='invalid',
+            )
+
+    if is_request_delete_submitted:
+        request_id = request.POST.get('request_id', None)
+        if request_id:
+            request = Request.objects.get(pk=request_id)
+            request.delete()
+        else:
+            raise forms.ValidationError(
+                    _('Invalid value'),
+                    code='invalid',
+            )
+
+    requests = Request.objects.all()
     context = {
         'course_types': course_types,
         'courses': courses,
+        'requests': requests,
+        'WAITING' : settings.WAITING,
+        'ACCEPTED' : settings.ACCEPTED,
+        'REJECTED' : settings.REJECTED,
     }
 
     return context

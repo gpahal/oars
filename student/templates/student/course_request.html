@@ -42,19 +42,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for course in courses %}
+                            {% for request in requests %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ course.code }}</td>
-                                    <td>{{ course.name }}</td>
+                                    <td>{{ request.course.code }}</td>
+                                    <td>{{ request.course.name }}</td>
                                     <td>
-                                        {% if course.professors.count == 0 %}
-                                            -
-                                        {% else %}
-                                            {% for professor in course.professors_set %}
-                                                {{ professor.user.get_full_name }}{% if not forloop.last %}, {% endif %}
-                                            {% endfor %}
-                                        {% endif %}
+                                        {{ request.course.credits }}
+                                    </td>
+                                    <td>
+                                    {% if request.status == WAITING %}
+                                        <span class="label label-primary">Waiting</span>
+                                    {% elif request.status == ACCEPTED %}
+                                        <span class="label label-success">Accepted</span>
+                                    {% elif request.status == REJECTED %}
+                                        <span class="label label-danger">Rejected</span>
+                                    {% endif %}
+                                    </td>
+                                    <td style="text-align:center;">
+                                       <form role="form" name="request_delete_form" action="{% url 'student:course_request'%}" method="post">
+                                       {% csrf_token %}
+                                            <input value="{{request.id}}" name="request_id" type="hidden" >
+                                           <input type="submit" name="request_delete" class="btn btn-flat btn-danger" value="Delete" >
+                                       </form> 
                                     </td>
                                 </tr>
                             {% endfor %}
