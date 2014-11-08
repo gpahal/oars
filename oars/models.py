@@ -215,10 +215,10 @@ class Course(models.Model):
 
     department = models.ForeignKey(Department)
     course_type = models.ForeignKey(CourseType)
-    code = models.CharField(max_length=5,
+    code = models.CharField(max_length=7,
         help_text=_('Required. 5 characters or fewer. Digits and uppercase letters only. '),
         validators=[
-            validators.RegexValidator(r'^[\d]{3}[A-Z]?$', _('Enter a valid course code.'), 'invalid'),
+            validators.RegexValidator(r'^[A-Z]{2,3}[\d]{3}[A-Z]?$', _('Enter a valid course code.'), 'invalid'),
         ])
     name = models.CharField(max_length=50,
         help_text=_('Required. 50 characters or fewer. Letters, digits, spaces and '
@@ -226,8 +226,8 @@ class Course(models.Model):
         validators=[
             validators.RegexValidator(r'^[ \w.@+-]+$', _('Enter a valid course name.'), 'invalid'),
         ])
-    professors = models.ManyToManyField(Professor,blank=True)
-    prerequisites = models.ManyToManyField("self",blank=True)
+    professors = models.ManyToManyField(Professor)
+    prerequisites = models.ManyToManyField("self", blank=True)
     is_offered = models.BooleanField(default=False)
     credits = models.PositiveSmallIntegerField(
         validators=[
@@ -272,17 +272,28 @@ class Request(models.Model):
         return "%s - %s" % (self.student, self.code)
 
 
-# class Filter(models.Model):
-#
-#     course = models.ForeignKey(Course)
-#     department = models.ForeignKey(Department, blank=True, null=True)
-#     min_semester = models.PositiveSmallIntegerField(
-#         validators=[
-#             validators.MinValueValidator(1),
-#             validators.MaxValueValidator(20),
-#         ])
-#     max_semester = models.PositiveSmallIntegerField(
-#         validators=[
-#             validators.MinValueValidator(1),
-#             validators.MaxValueValidator(20),
-#         ])
+class Filter(models.Model):
+
+    course = models.ForeignKey(Course)
+    department = models.ForeignKey(Department, blank=True, null=True)
+    min_semester = models.PositiveSmallIntegerField(
+        validators=[
+            validators.MinValueValidator(1),
+            validators.MaxValueValidator(20),
+        ])
+    max_semester = models.PositiveSmallIntegerField(
+        validators=[
+            validators.MinValueValidator(1),
+            validators.MaxValueValidator(20),
+        ])
+    min_cpi = models.PositiveSmallIntegerField(
+        validators=[
+            validators.MinValueValidator(0),
+            validators.MaxValueValidator(10),
+        ])
+    # here preference=11 referes to accept and preference=12 refers to reject
+    filter_type = models.PositiveSmallIntegerField(
+        validators=[
+            validators.MinValueValidator(1),
+            validators.MaxValueValidator(12),
+        ])

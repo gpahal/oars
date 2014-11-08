@@ -8,7 +8,7 @@ Data model for the app
 model Dept:
     - id (automatic)
     - code (CharField(max_length=5))
-    - name (CharField(max_length=25))
+    - name (CharField(max_length=45))
 
 model Student:
     - id (automatic)
@@ -16,7 +16,6 @@ model Student:
     - dept (ForeignKey(Dept))
     - semester (IntegerField)
     - cpi (DecimalField)
-    - current_courses (ManyToManyField(Course))
 
 model Professor:
     - id (automatic)
@@ -34,7 +33,7 @@ model CourseType:
 
 model Course:
     - id (automatic)
-    - dept (ForeignKey(Dept))
+    - department (ForeignKey(Dept))
    *- type (ForeignKey(CourseType)) (ex. CS, ESO, etc. )
     - code (CharField(max_length=8))
     - name (CharField(max_length=50))

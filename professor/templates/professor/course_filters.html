@@ -1,0 +1,107 @@
+{% extends 'professor/base.html' %}
+{% load staticfiles %}
+{% block title %}Course Filter{% endblock %}
+
+{% block heading %}Course Filter{% endblock %}
+
+{% block heading-small %}{% endblock %}
+
+{% block relative-address %}
+    <li class="active">Course Filters</li>
+{% endblock %}
+
+{% block request-class %}active{% endblock %}
+
+{% block content %}
+   {% for error in form.non_field_errors %}
+        <div class="alert alert-danger">{{ error|escape }}</div>
+    {% endfor %}
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">{{ error|escape }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+            <form role="form" name="course_search_form" autocapitalize="off" action="{% url 'professor:course_filters' %}" method="post">
+                <fieldset>
+
+                    <div>
+                        <h2 class="text-center">
+                            Search filters
+                        </h2>
+                    </div>
+                    <hr>
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="fieldWrapper form-group">
+                                <select id="id_course_type" name="course_type" class="chosen-select form-control input-lg" data-placeholder="Select course Type">
+                                    <option value=""></option>
+                                    {% for course_type in course_types %}
+                                        <option value="{{ course_type.id }}">{{ course_type.code }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="fieldWrapper form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                                    <input type="text" name="code" id="code" class="form-control input-lg" placeholder="Course code">
+                                </div>
+                            </div>
+                            <div class="fieldWrapper form-group">
+                                <select id="id_department" name="department" class="chosen-select form-control input-lg" data-placeholder="Select department">
+                                    <option value=""></option>
+                                    {% for department in departments %}
+                                        <option value="{{ department.id }}">{{ department.code }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="fieldWrapper form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                                    <input type="text" name="name" id="name" class="form-control input-lg" placeholder="Course title">
+                                </div>
+                            </div>
+                            <div class="fieldWrapper form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                                    <input type="text" name="professor_name" id="professor_name" class="form-control input-lg" placeholder="Instructor name">
+                                </div>
+                            </div>
+                            <div class="fieldWrapper form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                                    <input type="text" name="professor_email" id="professor_email" class="form-control input-lg" placeholder="Instructor email">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3">
+                            <input type="submit" name="course_search" class="btn btn-lg btn-flat btn-success btn-block" value="Search">
+                        </div>
+                    </div>
+
+                </fieldset>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extrascripts %}
+    <script src="{% static 'js/vendor/chosen/chosen.jquery.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/vendor/datatables/jquery.dataTables.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/vendor/datatables/dataTables.bootstrap.js' %}" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        $('.chosen-select').chosen({no_results_text:'No results found!', allow_single_deselect:true});
+    </script>
+{% endblock %}

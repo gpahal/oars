@@ -1,0 +1,177 @@
+{% extends 'student/base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}Course Request{% endblock %}
+
+{% block extrastyle %}
+    <link type="text/css" rel="stylesheet" href="{% static 'css/vendor/chosen/chosen.css' %}">
+{% endblock %}
+{% block heading %}Course Request{% endblock %}
+
+{% block heading-small %}User Info{% endblock %}
+
+{% block relative-address %}
+    <li class="active">Course Request</li>
+{% endblock %}
+
+{% block request-class %}active{% endblock %}
+
+{% block content %}
+    <div class="box box-solid box-primary">
+        <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-solid box-primary">
+                <div class="box-header">
+                    <div class="box-title">Requested Courses</div>
+                    <div class="box-tools pull-right">
+                <button class="btn btn-primary btn-sm" data-widget="collapse"> <span class="fa fa-minus"></span> </button>
+            </div>
+                </div><!-- /.box-header -->
+
+                <div class="box-body table-responsive">
+                    <table id="course-listing" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Course code</th>
+                                <th>Course title</th>
+                                <th>Credits</th>
+                                <th>Status</th>
+                                <th>Del</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ course.code }}</td>
+                                    <td>{{ course.name }}</td>
+                                    <td>
+                                        {% if course.professors.count == 0 %}
+                                            -
+                                        {% else %}
+                                            {% for professor in course.professors_set %}
+                                                {{ professor.user.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="box box-solid box-primary">
+        <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-solid box-primary">
+                <div class="box-header">
+                    <div class="box-title">Request a new Course</div>
+                    <div class="box-tools pull-right">
+                <button class="btn btn-primary btn-sm" data-widget="collapse"> <span class="fa fa-minus"></span> </button>
+            </div>
+                </div><!-- /.box-header -->
+
+                <div class="box-body table-responsive">
+                    <form role="form" name="course_request_form" action="{% url 'student:course_request'%}" method="post">
+                        {% csrf_token %}
+                        <table id="course-listing" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Course Type</th>
+                                    <th>Course code</th>
+                                    <th>Course title</th>
+                                    <th>Credits</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <select id="id_course_type" onChange="coursetype_select()" name="course_type" class="chosen-select form-control input-lg" data-placeholder="Select course Type">
+                                            <option value=""></option>
+                                              {% for course_type in course_types %}
+                                                    <option value="{{ course_type.id }}">{{ course_type.code }}</option>
+                                              {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td id="course_code">
+                                        <select id="id_course_code" name="course_code" class="chosen-select form-control input-lg" data-placeholder="Select course code" disabled>
+                                            <option value=""></option>
+                                        </select>
+                                    </td>
+                                    <td id="course_name"></td>
+                                    <td id="course_credits">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <input type="submit" name="course_request" class="btn btn-flat btn-success btn-block" style="width:15%;margin: 0 auto;">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extrascripts %}
+    <script src="{% static 'js/vendor/chosen/chosen.jquery.js' %}" type="text/javascript"></script>
+    <script >
+     
+        var courses = {};
+        var course_type = {};
+
+        {% for type in course_types %}
+            course_type['{{type.id}}'] = [];
+        {% endfor %}
+        
+        {% for course in courses %}
+            courses[{{course.id}}] = { 'id': {{course.id}} ,'name' : '{{course.name}}', 'credits' : {{course.credits}} } ;
+           course_type['{{course.course_type.id}}'].push({ 'id': {{course.id}}, 'code': '{{course.code}}'   });            
+        {% endfor %}
+
+        $(document).ready(function() {
+            $('.chosen-select').chosen({no_results_text:'No results found!', allow_single_deselect:true});
+        });
+
+        function coursetype_select(){
+            var myselect = document.getElementById("id_course_type");
+            var ctype = myselect.options[myselect.selectedIndex].value ;
+            var carray = course_type[ctype] ;
+            if(typeof carray != 'undefined'){
+                var i = 0 ;
+                var a = "<select id='id_course_code' onChange='course_select()' name='course_code' class='chosen-select form-control input-lg' data-placeholder='Select course code'><option value=''></option>";
+                for( i= 0 ; i < carray.length ; i++){
+                    console.log(carray[i]);
+                    a += "<option value='"+carray[i]['id']+"'>"+carray[i]['code']+"</option>";
+                }
+                a += "</select>";
+                document.getElementById("course_code").innerHTML = a ;
+                $('#id_course_code').chosen({no_results_text:'No results found!', allow_single_deselect:true});
+            }
+        }
+
+        function course_select(){
+            var myselect = document.getElementById("id_course_code");
+            var code = myselect.options[myselect.selectedIndex].value ;
+            var course_array = courses[code];
+            console.log(course_array['name']);
+            console.log(course_array['credits']);
+            document.getElementById('course_name').innerHTML =course_array['name'];
+            var c_credit = course_array['credits'] ;
+            var a = c_credit % 10 ;
+            var b = (Math.floor(c_credit / 10)) % 10 ; 
+            var c = Math.floor(c_credit / 100) ;
+            var tcredits = a + b + c ;
+            document.getElementById('course_credits').innerHTML =  c.toString() + '-' + b.toString() + '-' + a.toString() + '-'+tcredits.toString() ;
+        }
+    </script>
+{% endblock %}

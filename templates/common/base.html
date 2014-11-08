@@ -22,11 +22,11 @@
                 });
             })(window.jQuery);
         </script>
-        <link href="{% static "css/vendor/bootstrap-theme.min.css" %}" rel="stylesheet" type="text/css">
         <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-        <link href="{% static "css/AdminLTE.css" %}" rel="stylesheet" type="text/css">
 
         {% block extrastyle %}{% endblock %}
+
+        <link href="{% static "css/AdminLTE.css" %}" rel="stylesheet" type="text/css">
 
         <!--[if lt IE 9]>
             <script src="{% static 'js/vendor/html5-3.6-respond-1.1.0.min.js' %}"></script>
@@ -125,10 +125,9 @@
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
         <script>window.jQuery.fn.modal || document.write('<script src="{% static "js/vendor/bootstrap.min.js" %}"><\/script>')</script>
 
-        <script src="{% static "js/AdminLTE.js" %}"></script>
-        <script src="{% static "js/dashboard.js" %}"></script>
-
         {% block extrascripts %}{% endblock %}
+
+        <script src="{% static "js/AdminLTE.js" %}"></script>
 
     </body>
 </html>
