@@ -70,8 +70,8 @@ def course_request_context(request):
         course_code = request.POST.get('course_code', None)
         if course_code:
             course = Course.objects.get(pk=course_code)
-            request = Request(course=course, student=request.user.student, status=settings.WAITING)
-            request.save()
+            request_get = Request(course=course, student=request.user.student, status=settings.WAITING)
+            request_get.save()
         else:
             raise forms.ValidationError(
                     _('Invalid value'),
@@ -81,8 +81,8 @@ def course_request_context(request):
     if is_request_delete_submitted:
         request_id = request.POST.get('request_id', None)
         if request_id:
-            request = Request.objects.get(pk=request_id)
-            request.delete()
+            request_get = Request.objects.get(pk=request_id)
+            request_get.delete()
         else:
             raise forms.ValidationError(
                     _('Invalid value'),
