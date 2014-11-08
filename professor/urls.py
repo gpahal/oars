@@ -7,4 +7,5 @@ urlpatterns = patterns('',
     url(r'^course_listing/$', views.course_listing, name='course_listing'),
     url(r'^course_search/$', views.course_search, name='course_search'),
     url(r'^course_filters/$', views.course_filters, name='course_filters'),
+#   url(r'^courses/(?P<course_id>\d+)/filters/$', )
 )

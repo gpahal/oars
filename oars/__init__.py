@@ -89,7 +89,7 @@ def course_request_context(request):
                     code='invalid',
             )
 
-    requests = Request.objects.all()
+    requests = Request.objects.filter(student=request.user.student)
     context = {
         'course_types': course_types,
         'courses': courses,

@@ -37,6 +37,8 @@ def course_search(request, template_name='professor/course_search.html'):
 
     return TemplateResponse(request, template_name, context=context)
 
+# def course_filter(request, course_id=None)
+
 def course_filters(request, template_name='professor/course_filters.html'):
 
     context = context_wrapper(request, course_search_context(request))
