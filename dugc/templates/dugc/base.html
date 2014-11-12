@@ -10,9 +10,10 @@
             <span class="fa fa-user"></span> <span>Profile</span>
         </a>
     </li>
-    <li class="{% block request-class %}{% endblock %}">
-        <a href="{% url 'dugc:profile' %}">
-            <span class="fa fa-check-square"></span> <span>Course Request</span>
+    <li class="{% block courses-offered-class %}{% endblock %}">
+        <a href="{% url 'dugc:courses_offered' %}">
+            <span class="fa fa-check-square"></span>
+            <span>Courses offered</span>
         </a>
     </li>
     <li class="treeview {% block courses-class %}{% endblock %}">

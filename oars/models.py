@@ -52,8 +52,7 @@ class User(AbstractBaseUser):
         ])
 
     email = models.EmailField(_('email address'))
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    full_name = models.CharField(_('first name'), max_length=50, blank=True)
     date_of_birth = models.DateField(_('date of birth'), null=True, blank=True)
     is_admin = models.BooleanField(_('admin status'), default=False,
         help_text=_('Designates whether the user can log into the admin '
@@ -74,25 +73,20 @@ class User(AbstractBaseUser):
 
     def get_full_name(self):
         """
-        Returns the first_name plus the last_name, with a space in between.
+        Returns the full name.
         """
 
-        if self.first_name == "":
-            if self.last_name == "":
-                full_name = self.username
-            else:
-                full_name = self.last_name
+        if self.full_name == "":
+            return self.username.capitalize()
         else:
-            if self.last_name == "":
-                full_name = self.first_name
-            else:
-                full_name = '%s %s' % (self.first_name, self.last_name)
-
-        return full_name.strip()
+            return self.full_name.capitalize()
 
     def get_short_name(self):
-        "Returns the short name for the user."
-        return self.first_name
+        """
+        Returns the short name for the user.
+        """
+
+        return self.username
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """
@@ -155,6 +149,9 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.get_username()
 
+    def get_full_name(self):
+        return self.user.get_full_name()
+
 
 class Department(models.Model):
 
@@ -163,8 +160,8 @@ class Department(models.Model):
         validators=[
             validators.RegexValidator(r'^[A-Z]+$', _('Enter a valid department code.'), 'invalid'),
         ])
-    name = models.CharField(max_length=25, unique=True,
-        help_text=_('Required. 25 characters or fewer. Letters, digits, spaces and '
+    name = models.CharField(max_length=50, unique=True,
+        help_text=_('Required. 50 characters or fewer. Letters, digits, spaces and '
                     '@/./+/-/_ only.'),
         validators=[
             validators.RegexValidator(r'^[ \w.@+-]+$', _('Enter a valid department name.'), 'invalid'),
@@ -178,11 +175,18 @@ class Student(Profile):
 
     user_type = settings.USER_STUDENT
     department = models.ForeignKey(Department)
+    roll_no = models.PositiveSmallIntegerField(
+        validators=[
+            validators.MinValueValidator(1),
+        ],
+        unique=True,
+    )
     semester = models.PositiveSmallIntegerField(
         validators=[
             validators.MinValueValidator(1),
             validators.MaxValueValidator(20),
-        ])
+        ],
+    )
     cpi = models.DecimalField(_("CPI"), max_digits=4, decimal_places=2)
 
 
@@ -234,6 +238,10 @@ class Course(models.Model):
             validators.MinValueValidator(100),
             validators.MaxValueValidator(999),
         ])
+    limit = models.PositiveSmallIntegerField(
+        validators=[
+            validators.MinValueValidator(1),
+        ])
 
     def __str__(self):
         return self.code
@@ -243,6 +251,9 @@ class CurrentCourse(models.Model):
 
     course = models.ForeignKey(Course)
     student = models.ForeignKey(Student)
+
+    class Meta:
+        unique_together = (('course', 'student'),)
 
     def __str__(self):
         return "%s - %s" % (self.student, self.code)
@@ -258,18 +269,25 @@ class PreviousCourse(models.Model):
             validators.MaxValueValidator(10),
         ])
 
+    class Meta:
+        unique_together = (('course', 'student'),)
+
     def __str__(self):
         return "%s - %s" % (self.student, self.code)
 
 
 class Request(models.Model):
 
-    course = models.OneToOneField(Course)
-    student = models.OneToOneField(Student)
+    course = models.ForeignKey(Course)
+    student = models.ForeignKey(Student)
     status = models.PositiveSmallIntegerField(choices=settings.REQUEST_STATUS_CHOICES, default=settings.WAITING)
+    limit_exceeded = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = (('course', 'student'),)
 
     def __str__(self):
-        return "%s - %s" % (self.student, self.code)
+        return "%s - %s" % (self.student, self.course)
 
 
 class Filter(models.Model):
@@ -280,20 +298,33 @@ class Filter(models.Model):
         validators=[
             validators.MinValueValidator(1),
             validators.MaxValueValidator(20),
-        ])
+        ],
+        blank=True,
+        null=True,
+    )
     max_semester = models.PositiveSmallIntegerField(
         validators=[
             validators.MinValueValidator(1),
             validators.MaxValueValidator(20),
-        ])
+        ],
+        blank=True,
+        null=True,
+    )
     min_cpi = models.PositiveSmallIntegerField(
         validators=[
             validators.MinValueValidator(0),
             validators.MaxValueValidator(10),
-        ])
-    # here preference=11 referes to accept and preference=12 refers to reject
+        ],
+        blank=True,
+        null=True,
+    )
+    # format: settings.ACCEPTED(1) for accept, settings.REJECTED(2) for reject,
+    # [11-20] for preferences
     filter_type = models.PositiveSmallIntegerField(
         validators=[
             validators.MinValueValidator(1),
-            validators.MaxValueValidator(12),
-        ])
+            validators.MaxValueValidator(20),
+        ],
+        blank=True,
+        null=True,
+    )

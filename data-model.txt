@@ -34,14 +34,15 @@ model CourseType:
 model Course:
     - id (automatic)
     - department (ForeignKey(Dept))
-   *- type (ForeignKey(CourseType)) (ex. CS, ESO, etc. )
+    - course_type (ForeignKey(CourseType)) (ex. CS, ESO, etc. )
     - code (CharField(max_length=8))
     - name (CharField(max_length=50))
     - professors (ManyToManyField(Professor))
     - prerequisites (ManyToManyField(Course))
     - is_offered (BooleanField)
-   *- credits (IntegerField) (format: [L][T][P])
-    - schedule (CommaSeparatedIntegerField) (format: [type = 1(L) | 2(T) | 3(P)][day = 01 | 02 | 04 | 08 |16][start_time = 24-hour clock time][2*duration])
+    - limit (PositiveIntegerField)
+    - credits (IntegerField) (format: [L][T][P])
+   *- schedule (CommaSeparatedIntegerField) (format: [type = 1(L) | 2(T) | 3(P)][day = 01 | 02 | 04 | 08 |16][start_time = 24-hour clock time][2*duration])
     - description (TextField)
     - notes (CharField(max_length=100))
 
@@ -50,6 +51,12 @@ model Request:
     - course (Course)
     - student (Student)
     - status (IntegerField) (!!to be decided options: waiting, accepted, rejected)
+    - limit_exceeded (BooleanField)
+
+model CurrentCourse:
+    - id (automatic)
+    - course (ForeignKey(Course))
+    - student (ForeignKey(Student))
 
 model PreviousCourses:
     - id (automatic)
@@ -57,3 +64,11 @@ model PreviousCourses:
     - student (ForeignKey(Student))
     - semester (IntegerField)
     - grade (IntegerField)
+
+model Filter:
+    - id (automatic)
+    - department (ForeignKey(Department))
+    - min_semester (PositiveSmallIntegerField)
+    - max_semester (PositiveSmallIntegerField)
+    - min_cpi (PositiveSmallIntegerField)
+    - filter_type (PositiveSmallIntegerField) (format: settings.ACCEPTED(1) for accept, settings.REJECTED(2) for reject, [11-20] for preferences)

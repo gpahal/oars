@@ -1,4 +1,4 @@
-{% extends 'professor/base.html' %}
+{% extends 'dugc/base.html' %}
 
 {% load staticfiles %}
 
@@ -13,11 +13,11 @@
 {% block heading-small %}
     Course Filters &nbsp; &nbsp; &nbsp;
     <a class="btn btn-sm btn-flat btn-primary" style="position: absolute; top: 8px; font-size: 0.9em"
-       href="{% url 'professor:course' course_id=course.id %}">Course Home</a>
+       href="{% url 'dugc:course' course_id=course.id %}">Course Home</a>
 {% endblock %}
 
 {% block relative-address %}
-    <li><a href="{% url 'professor:course' course_id=course.id %}">{{ course.code }}</a></li>
+    <li><a href="{% url 'dugc:course' course_id=course.id %}">{{ course.code }}</a></li>
     <li class="active">Course filters</li>
 {% endblock %}
 
@@ -77,7 +77,7 @@
                                     </td>
                                     <td class="text-center">
                                         <form role="form" name="filter_delete_form"
-                                              action="{% url 'professor:course_filters' course_id=course.id %}" method="post">
+                                              action="{% url 'dugc:course_filters' course_id=course.id %}" method="post">
                                             {% csrf_token %}
                                             <input value="{{ filter.id }}" name="filter_id" type="hidden">
                                             <input type="submit" name="filter_delete" class="btn btn-flat btn-sm btn-danger"
@@ -107,7 +107,7 @@
                     </div>
                     <!-- /.box-header -->
 
-                    <form role="form" name="course_filter_form" action="{% url 'professor:course_filters' course_id=course.id %}" method="post">
+                    <form role="form" name="course_filter_form" action="{% url 'dugc:course_filters' course_id=course.id %}" method="post">
                         {% csrf_token %}
                         <div class="box-body table-responsive">
                             <!--div class="table-responsive"-->
@@ -216,16 +216,6 @@
                                                 <option value=""></option>
                                                 <option value="{{ ACCEPTED }}">ACCEPT</option>
                                                 <option value="{{ REJECTED }}">REJECT</option>
-                                                <option value="11">Preference: 1</option>
-                                                <option value="12">Preference: 2</option>
-                                                <option value="13">Preference: 3</option>
-                                                <option value="14">Preference: 4</option>
-                                                <option value="15">Preference: 5</option>
-                                                <option value="16">Preference: 6</option>
-                                                <option value="17">Preference: 7</option>
-                                                <option value="18">Preference: 8</option>
-                                                <option value="19">Preference: 9</option>
-                                                <option value="20">Preference: 10</option>
                                             </select>
                                         </td>
                                     </tr>

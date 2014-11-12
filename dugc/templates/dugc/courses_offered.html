@@ -1,0 +1,74 @@
+{% extends 'dugc/base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}Courses Offered{% endblock %}
+
+{% block heading %}Courses Offered{% endblock %}
+
+{% block relative-address %}
+    <li class="active">Courses Offered</li>
+{% endblock %}
+
+{% block courses-offered-class %}active{% endblock %}
+
+{% block content %}
+    <div class="box box-solid box-primary">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-solid box-primary">
+                    <div class="box-header">
+                        <div class="box-title">Courses offered</div>
+                        <div class="box-tools pull-right">
+                            <button class="btn btn-primary btn-sm" data-widget="collapse"><span
+                                    class="fa fa-minus"></span></button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+
+                    <div class="box-body table-responsive">
+                        <table id="course-listing" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th class="col-md-1">#</th>
+                                <th class="col-md-1">Course code</th>
+                                <th class="col-md-3">Course title</th>
+                                <th class="col-md-2">Instructor(s)</th>
+                                <th class="col-md-2 text-center">Filters</th>
+                                <th class="col-md-3 text-center">Student lists</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for course in courses %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ course.code }}</td>
+                                    <td><a href="{% url 'dugc:course' course_id=course.id %}">{{ course.name }}</a></td>
+                                    <td>
+                                        {% if course.professors.count == 0 %}
+                                            -
+                                        {% else %}
+                                            {% for professor in course.professors.all %}
+                                                {{ professor.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center"><a href="{% url 'dugc:course_filters' course_id=course.id %}">Filters</a></td>
+                                    <td class="text-center">
+                                        <a href="{% url 'dugc:students_waiting' course_id=course.id %}">Waiting</a>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <a href="{% url 'dugc:students_accepted' course_id=course.id %}">Accepted</a>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <a href="{% url 'dugc:students_rejected' course_id=course.id %}">Rejected</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

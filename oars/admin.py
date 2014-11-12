@@ -4,14 +4,14 @@ from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.utils.translation import ugettext_lazy as _
 
 from oars.forms import UserCreationForm, UserChangeForm
-from oars.models import (User, Department, Student, Professor, DUGC,
-                         CourseType, Course, CurrentCourse, PreviousCourse)
+from oars.models import (User, Department, Student, Professor, DUGC, CourseType,
+                         Course, CurrentCourse, PreviousCourse, Request, Filter)
 
 
 class UserAdmin(DefaultUserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'email', 'password')}),
-        (_('Personal info'), {'fields': ('first_name', 'last_name', 'date_of_birth')}),
+        (_('Personal info'), {'fields': ('full_name', 'date_of_birth')}),
         (_('Permissions'), {'fields': ('is_active', 'is_admin',)}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
@@ -27,9 +27,9 @@ class UserAdmin(DefaultUserAdmin):
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_admin')
+    list_display = ('username', 'email', 'full_name', 'is_admin')
     list_filter = ('is_admin', 'is_active')
-    search_fields = ('username', 'first_name', 'last_name', 'email')
+    search_fields = ('username', 'full_name', 'email')
     ordering = ('username',)
     filter_horizontal = ()
 
@@ -44,6 +44,9 @@ admin.site.register(CourseType)
 admin.site.register(Course)
 admin.site.register(CurrentCourse)
 admin.site.register(PreviousCourse)
+admin.site.register(Request)
+admin.site.register(Filter)
+
 # ... and, since we're not using Django's built-in permissions,
 # unregister the Group model from admin.
 admin.site.unregister(Group)

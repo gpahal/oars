@@ -111,10 +111,10 @@ $(function() {
         //If the wrapper height is greater than the window
         if (content > height)
             //then set sidebar height to the wrapper
-            $(".left-side, html, body").css("min-height", content + "px");
+            $(".left-side, .right-side, html, body").css("min-height", content + "px");
         else {
             //Otherwise, set the sidebar to the height of the window
-            $(".left-side, html, body").css("min-height", height + "px");
+            $(".left-side, .right-side, html, body").css("min-height", height + "px");
         }
     }
     //Fire upon load

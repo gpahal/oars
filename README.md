@@ -1,29 +1,62 @@
 # Course Allocation System (OARS)
 
-This is a course allocation system where registered students may request for available courses and professors can offer courses and can optionally define filters and preferences to automatically accept or reject.
+>This is a course allocation system where registered students may request for available courses and >professors can offer courses and can optionally define filters and preferences to automatically >accept or reject.
 
-This project is built using the [*Django framework*](https://www.djangoproject.com/). The frontend is based on [*Twitter Bootstrap*](http://getbootstrap.com/) and [*AdminLTE template*](http://almsaeedstudio.com/AdminLTE/).
+## Tech
+This project is built using a number open source projects.
+
+- [*Django framework*](https://www.djangoproject.com/)
+- [*Twitter Bootstrap*](http://getbootstrap.com/)
+- [*AdminLTE template*](http://almsaeedstudio.com/AdminLTE/)
+- [*Grappelli admin interface*](http://grappelliproject.com/)
 
 ## Setup
 
-1. Install Python 3.x
-2. Install Django 1.7
+1. Install [*Python 3.x*](https://www.python.org/downloads/)
+2. Install [*Django 1.7*](https://docs.djangoproject.com/en/1.7/intro/install/)
 3. Download the code
 4. cd to the project directory
-5. run the following command
-
-    ./manage.py runserver
-
+5. run the following command  ```$ python3 manage.py runserver```
 6. Done!
 
 ## Site map
 
-You can now view the website at [*http://localhost:8000/*](http://localhost:8000/) (currently there is nothing)
+After installation, you can view the website at [*http://localhost:8000/*](http://localhost:8000/)
 
-URL configuration (path relative to http://localhost:8000):
+URL configuration (relative path):
 
-- admin: /admin
-- login: /auth/login
-- logout: /auth/logout
-- password reset: /auth/password_reset
-- password change: /auth/password_change
+- admin: [*/admin*](http://localhost:8000/admin/)
+- login: [*/auth/login*](http://localhost:8000/login/)
+- logout: [*/logout*](http://localhost:8000/logout/)
+- password reset: [*/password_reset*](http://localhost:8000/password_reset/)
+- password change: [*/password_change*](http://localhost:8000/password_change/)
+- student: [*/student*](http://localhost:8000/student/)
+- professor: [*/professor*](http://localhost:8000/professor/)
+- dugc: [*/dugc*](http://localhost:8000/dugc/)
+
+Other facilities can be explored easily using the interface once you are logged in.
+
+## Initial settings
+
+### Site email
+
+- email: oars.django@gmail.com
+- passsword: django.oars
+
+### Users
+
+- Admins
+    - admin
+
+- Students
+    - student1
+    - student2
+
+- Professors
+    - prof1
+    - prof2
+
+- DUGC's
+    - dugc1
+
+Passwords are the same as usernames for all the users.

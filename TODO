@@ -1,0 +1,14 @@
+Tasks:
+    - Insert Accept, Reject button in the waiting list.
+    - Sort waiting list with respect to preferences.
+    - Use course limit in course_requests, course_filters and updating Request.limit_exceeded.
+        Students not accepted because of limit exceeded will be put in a waiting list and those that passed the
+        initial filters (got accepted) will get a preference of 10. Request.limit_exceeded will be set to true for such
+        requests and will help in finding them.
+    - Use is_offered in course_requests, course_filters, courses_offered, course_listing, course_search and others.
+    - Implement course plan and timetable clash if possible.
+    - Allocate appropriate permissions to professors and dugc's. Don't allow them to alter courses of other
+        professors or departments. Also, dugc's have limited filter permissions.
+    - Make the forms on course_requests and course_filters responsive.
+    - Improve admin, especially ManyToMany fields.
+    - Site structure (admin and main site).

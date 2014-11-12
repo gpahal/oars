@@ -1,0 +1,157 @@
+{% extends 'professor/base.html' %}
+
+{% block title %}Course: {{ course.id }}{% endblock %}
+
+{% block extrastyle %}
+    <style type="text/css">
+        a.btn {
+            margin-top: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block extrahead %}
+    <script type="text/javascript">
+        function credits_to_string(credits) {
+            var p = credits % 10;
+            var t = (Math.floor(credits / 10)) % 10;
+            var l = Math.floor(credits / 100);
+            var total_credits = l + t + p;
+            return l.toString() + '-' + t.toString() + '-' + p.toString() + '-' + total_credits.toString();
+        }
+    </script>
+{% endblock %}
+
+{% block courses-offered-class %}active{% endblock %}
+
+{% block heading %}Course: {{ course.code }}{% endblock %}
+
+{% block heading-small %}
+    Course home
+{% endblock %}
+
+{% block relative-address %}
+    <li class="active">{{ course.code }}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="box box-solid box-primary">
+        <div class="box-header">
+            <div class="box-title">
+                Course information
+            </div>
+            <div class="box-tools pull-right">
+                <button class="btn btn-primary btn-sm" data-widget="collapse"> <span class="fa fa-minus"></span> </button>
+            </div>
+        </div>
+        <div class="box-body">
+            <table class="table table-bordered table-striped table-responsive">
+                <tbody>
+                    <tr>
+                        <td>
+                            Course title
+                        </td>
+                        <td>
+                            {{ course.name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Course type
+                        </td>
+                        <td>
+                            {{ course.course_type.code }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Course code
+                        </td>
+                        <td>
+                            {{ course.code }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Department
+                        </td>
+                        <td>
+                            {{ course.department.name }} ({{ course.department.code }})
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Professors
+                        </td>
+                        <td>
+                            {% if course.professors.count == 0 %}
+                                -
+                            {% else %}
+                                {% for professor in course.professors.all %}
+                                    {{ professor.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Prerequisites
+                        </td>
+                        <td>
+                            {% if course.prerequisites.count == 0 %}
+                                -
+                            {% else %}
+                                {% for prerequisite in course.prerequisites.all %}
+                                    {{ prerequisite.code }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Is being offered?
+                        </td>
+                        <td>
+                            {% if course.is_offered %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Credits
+                        </td>
+                        <td>
+                            <script> document.write(credits_to_string({{ course.credits }})); </script>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Student limit
+                        </td>
+                        <td>
+                            {{ course.limit }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-6 col-md-3">
+            <a class="btn btn-lg btn-flat btn-block btn-success" href="{% url 'professor:course_filters' course_id=course.id %}">Filters</a>
+        </div>
+        <div class="col-xs-6 col-md-3">
+            <a class="btn btn-lg btn-flat btn-block btn-success" href="{% url 'professor:students_waiting' course_id=course.id %}">Waiting list</a>
+        </div>
+        <div class="col-xs-6 col-md-3">
+            <a class="btn btn-lg btn-flat btn-block btn-success" href="{% url 'professor:students_accepted' course_id=course.id %}">Accepted list</a>
+        </div>
+        <div class="col-xs-6 col-md-3">
+            <a class="btn btn-lg btn-flat btn-block btn-success" href="{% url 'professor:students_rejected' course_id=course.id %}">Rejected list</a>
+        </div>
+    </div>
+{% endblock %}

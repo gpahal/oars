@@ -151,10 +151,10 @@
                     <table id="course-listing" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Course code</th>
-                                <th>Course title</th>
-                                <th>Instructor(s)</th>
+                                <th class="col-md-1">#</th>
+                                <th class="col-md-2">Course code</th>
+                                <th class="col-md-5">Course title</th>
+                                <th class="col-md-4">Instructor(s)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -167,8 +167,8 @@
                                         {% if course.professors.count == 0 %}
                                             -
                                         {% else %}
-                                            {% for professor in course.professors_set %}
-                                                {{ professor.user.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                            {% for professor in course.professors.all %}
+                                                {{ professor.get_full_name }}{% if not forloop.last %}, {% endif %}
                                             {% endfor %}
                                         {% endif %}
                                     </td>
