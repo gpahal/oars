@@ -1,6 +1,7 @@
 # Course Allocation System (OARS)
 
->This is a course allocation system where registered students may request for available courses and >professors can offer courses and can optionally define filters and preferences to automatically >accept or reject.
+>This is a course allocation system where registered students may request for available courses and 
+>professors can offer courses and can optionally define filters and preferences to automatically accept or reject.
 
 ## Tech
 This project is built using a number open source projects.
