@@ -57,15 +57,6 @@
 
 {% block content %}
 
-    {% for error in form.non_field_errors %}
-        <div class="alert alert-danger">{{ error|escape }}</div>
-    {% endfor %}
-    {% for field in form %}
-        {% for error in field.errors %}
-            <div class="alert alert-danger">{{ error|escape }}</div>
-        {% endfor %}
-    {% endfor %}
-
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
             <form role="form" name="course_search_form" autocapitalize="off" action="{% url action_url %}" method="post">

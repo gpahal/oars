@@ -1,9 +1,17 @@
-from oars.models import Department, Professor, CourseType, Course, Request, Filter
+from oars.models import Department, Student, Professor, CourseType, Course, Request, Filter
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 from decimal import Decimal
+
+
+def is_number(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
 
 
 def is_filter_satisfied(request_obj, filter_obj):
@@ -49,7 +57,7 @@ def course_requests_context(request):
     if is_new_request_submitted:
         course_code = request.POST.get('course_code', None)
         if course_code:
-            course = Course.objects.get(pk=course_code)
+            course = Course.objects.get(code=course_code)
             request_obj = Request(course=course, student=request.user.student, status=settings.WAITING)
             filters = Filter.objects.filter(course=course, filter_type__in=(settings.ACCEPTED, settings.REJECTED))
             for filter_obj in filters:
@@ -293,14 +301,58 @@ def course_filters_limited_context(request, course_id):
     return context
 
 
-def students_waiting_context(course_id):
+def students_waiting_context(request, course_id):
 
     course = get_object_or_404(Course, id=course_id)
     requests = Request.objects.filter(course_id=course_id, status=settings.WAITING)
+
     context = {
         'course': course,
         'requests': requests,
     }
+
+    if request.method == 'POST':
+        is_number_selection_accept_submitted = request.POST.get('selection_number_accept', None)
+        is_number_selection_reject_submitted = request.POST.get('selection_number_reject', None)
+        is_selection_submitted = request.POST.get('selection_submit', None)
+    else:
+        is_number_selection_accept_submitted = False
+        is_number_selection_reject_submitted = False
+        is_selection_submitted = False
+
+    if is_number_selection_accept_submitted or is_number_selection_reject_submitted:
+        selection_type = request.POST.get('selection_type', None)
+        selection_number = request.POST.get('selection_number', None)
+
+        if selection_type and selection_number:
+            # selct the top 'selection_number' from 'selection_type' based on list sorted by preferences
+            pass
+
+    if is_selection_submitted:
+        for key, value in request.POST.items():
+            if value == '1' or value == '0':
+                if not is_number(key):
+                    continue
+                try:
+                    request_obj = requests.get(id=key)
+                    if request_obj.status == settings.WAITING:
+                        if value == '1':
+                            request_obj.status = settings.ACCEPTED
+                            request_obj.save()
+                        else:
+                            request_obj.status = settings.REJECTED
+                            request_obj.save()
+
+                except Request.DoesNotExist:
+                    raise ValidationError(
+                        _('Invalid request id'),
+                        code='invalid',
+                    )
+                # except:
+                #     raise ValidationError(
+                #         _('Error while applying changes to request id'),
+                #         code='internal_error',
+                #     )
 
     return context
 
@@ -379,6 +431,97 @@ def course_search_context(request):
         'departments': departments,
         'course_types': course_types,
         'courses': courses,
+    }
+
+    return context
+
+
+def mailing_list_context(request):
+
+    departments = Department.objects.all()
+    emails = []
+    display_emails = False
+    department = None
+    min_semester = None
+    max_semester = None
+    min_cpi = None
+    email_self = "true"
+
+    if request.method == 'POST':
+        is_email_list_submitted = request.POST.get('get_email_list', None)
+        is_send_message_submitted = request.POST.get('send_message', None)
+    else:
+        is_email_list_submitted = False
+        is_send_message_submitted = False
+
+    if is_email_list_submitted or is_send_message_submitted:
+        students = Student.objects.all()
+        department = request.POST.get('department', None)
+        if department:
+            try:
+                department_obj = Department.objects.get(id=department)
+                students = students.filter(department=department_obj)
+            except Department.DoesNotExist:
+                raise ValidationError(
+                    _('Invalid department'),
+                    code='invalid',
+                )
+
+        min_semester = request.POST.get('min_semester', None)
+        if min_semester:
+            students = students.filter(semester__gte=min_semester)
+
+        max_semester = request.POST.get('max_semester', None)
+        if max_semester:
+            students = students.filter(semester__lte=max_semester)
+
+        min_cpi = request.POST.get('min_cpi', None)
+        if min_cpi:
+            students = students.filter(cpi__gte=min_cpi)
+
+        emails = [student.user.email for student in students]
+
+        email_self = request.POST.get('email_self', None)
+        if email_self == 'true':
+            emails.append(request.user.email)
+
+    if is_send_message_submitted:
+        cc_to = request.POST.get('cc_to', None)
+        if cc_to:
+            cc_to = cc_to.replace(' ', '')
+            cc_to = cc_to.split(',')
+        else:
+            cc_to = []
+
+        bcc_to = request.POST.get('bcc_to', None)
+        if bcc_to:
+            bcc_to = bcc_to.replace(' ', '')
+            bcc_to = bcc_to.split(',')
+        else:
+            bcc_to = []
+
+        subject = request.POST.get('subject', None)
+        if not subject:
+            subject = ""
+
+        message = request.POST.get('message', None)
+        if not message:
+            message = ""
+
+
+    if is_email_list_submitted:
+        display_emails = True
+
+    context = {
+        'departments': departments,
+        'email_list': ', '.join(emails),
+        'email_count': len(emails),
+        'display_emails': display_emails,
+        'department': department,
+        'min_semester': min_semester,
+        'max_semester': max_semester,
+        'min_cpi': min_cpi,
+        'email_self': (email_self == "true"),
     }
 
     return context

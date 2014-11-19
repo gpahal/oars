@@ -116,6 +116,10 @@ $(function() {
             //Otherwise, set the sidebar to the height of the window
             $(".left-side, .right-side, html, body").css("min-height", height + "px");
         }
+        var element = $('section.content');
+        var parentHeight = parseInt($('aside.right-side').css('min-height'), 10);
+        var headerHeight = $('section.content-header').outerHeight();
+        element.css("min-height", (parentHeight-headerHeight-40).toString() + "px");
     }
     //Fire upon load
     _fix();
@@ -133,10 +137,10 @@ $(function() {
      * iCheck plugin in.
      * You can find the documentation at http://fronteed.com/iCheck/
      */
-    $("input[type='checkbox']:not(.simple), input[type='radio']:not(.simple)").iCheck({
+    /*$("input[type='checkbox']:not(.simple), input[type='radio']:not(.simple)").iCheck({
         checkboxClass: 'icheckbox_minimal',
         radioClass: 'iradio_minimal'
-    });
+    });*/
 
 });
 function fix_sidebar() {
@@ -627,7 +631,7 @@ $(window).load(function() {
  * -----------------------
  * This plugin depends on iCheck plugin for checkbox and radio inputs
  */
-(function($) {
+/*(function($) {
     "use strict";
 
     $.fn.todolist = function(options) {
@@ -656,7 +660,7 @@ $(window).load(function() {
         });
     };
 
-}(jQuery));
+}(jQuery));*/
 
 /* CENTER ELEMENTS */
 (function($) {
@@ -890,7 +894,7 @@ $(window).load(function() {
 })(jQuery);
 
 /*! iCheck v1.0.1 by Damir Sultanov, http://git.io/arlzeA, MIT Licensed */
-(function(h) {
+/*(function(h) {
     function F(a, b, d) {
         var c = a[0], e = /er/.test(d) ? m : /bl/.test(d) ? s : l, f = d == H ? {checked: c[l], disabled: c[s], indeterminate: "true" == a.attr(m) || "false" == a.attr(w)} : c[e];
         if (/^(ch|di|in)/.test(d) && !f)
@@ -1051,4 +1055,4 @@ $(window).load(function() {
             })
         })
     }
-})(window.jQuery || window.Zepto);
+})(window.jQuery || window.Zepto);*/

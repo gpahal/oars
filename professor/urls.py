@@ -12,4 +12,5 @@ urlpatterns = patterns('',
     url(r'^courses/(?P<course_id>\d+)/rejected/$', views.students_rejected, name='students_rejected'),
     url(r'^course_listing/$', views.course_listing, name='course_listing'),
     url(r'^course_search/$', views.course_search, name='course_search'),
+    url(r'^mailing_list/$', views.mailing_list, name='mailing_list'),
 )
