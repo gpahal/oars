@@ -232,6 +232,7 @@ class Course(models.Model):
         ])
     professors = models.ManyToManyField(Professor)
     prerequisites = models.ManyToManyField("self", blank=True)
+    schedule = models.CommaSeparatedIntegerField(max_length=70, default='101162,102162,104162')
     is_offered = models.BooleanField(default=False)
     credits = models.PositiveSmallIntegerField(
         validators=[
@@ -282,6 +283,17 @@ class Request(models.Model):
     student = models.ForeignKey(Student)
     status = models.PositiveSmallIntegerField(choices=settings.REQUEST_STATUS_CHOICES, default=settings.WAITING)
     limit_exceeded = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = (('course', 'student'),)
+
+    def __str__(self):
+        return "%s - %s" % (self.student, self.course)
+
+class CoursePlan(models.Model):
+
+    course = models.ForeignKey(Course)
+    student = models.ForeignKey(Student)
 
     class Meta:
         unique_together = (('course', 'student'),)

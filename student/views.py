@@ -2,7 +2,7 @@ from django.template.response import TemplateResponse
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
-from oars import course_listing_context, course_search_context, course_requests_context
+from oars import course_listing_context, course_search_context, course_requests_context, course_plan_context
 
 
 def context_wrapper(request, context):
@@ -28,6 +28,12 @@ def profile(request, template_name='student/profile.html'):
 def course_requests(request, template_name='student/course_requests.html'):
 
     context = context_wrapper(request, course_requests_context(request))
+
+    return TemplateResponse(request, template_name, context=context)
+
+def course_plan(request, template_name='student/course_plan.html'):
+
+    context = context_wrapper(request, course_plan_context(request))
 
     return TemplateResponse(request, template_name, context=context)
 

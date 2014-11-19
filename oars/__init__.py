@@ -1,9 +1,10 @@
-from oars.models import Department, Student, Professor, CourseType, Course, Request, Filter
+from oars.models import Department, Student, Professor, CourseType, Course, Request, Filter, CoursePlan
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 from decimal import Decimal
+import itertools
 
 
 def is_number(s):
@@ -57,7 +58,7 @@ def course_requests_context(request):
     if is_new_request_submitted:
         course_code = request.POST.get('course_code', None)
         if course_code:
-            course = Course.objects.get(code=course_code)
+            course = Course.objects.get(id=course_code)
             request_obj = Request(course=course, student=request.user.student, status=settings.WAITING)
             filters = Filter.objects.filter(course=course, filter_type__in=(settings.ACCEPTED, settings.REJECTED))
             for filter_obj in filters:
@@ -99,6 +100,56 @@ def course_requests_context(request):
 
     return context
 
+def course_plan_context(request):
+
+    course_types = CourseType.objects.all()
+    courses = Course.objects.all()
+
+    if request.method == 'POST':
+        is_new_request_submitted = request.POST.get('course_plan', None)
+        is_request_delete_submitted = request.POST.get('request_delete', None)
+    else:
+        is_new_request_submitted = False
+        is_request_delete_submitted = False
+
+    if is_new_request_submitted:
+        course_code = request.POST.get('course_code', None)
+        if course_code:
+            course = Course.objects.get(id=course_code)
+            request_obj = CoursePlan(course=course, student=request.user.student )
+            request_obj.save()
+
+        else:
+            raise ValidationError(
+                _('Invalid value'),
+                code='invalid',
+            )
+
+    if is_request_delete_submitted:
+        request_id = request.POST.get('request_id', None)
+        if request_id:
+            try:
+                request_obj = CoursePlan.objects.get(id=request_id)
+                request_obj.delete()
+            except:
+                raise ValidationError(
+                    _('Invalid value'),
+                    code='invalid',
+                )
+        else:
+            raise ValidationError(
+                _('Invalid value'),
+                code='invalid',
+            )
+
+    requests = CoursePlan.objects.filter(student=request.user.student)
+    context = {
+        'course_types': course_types,
+        'courses': courses,
+        'requests': requests,
+    }
+
+    return context
 
 def courses_offered_context(request):
 
@@ -304,12 +355,11 @@ def course_filters_limited_context(request, course_id):
 def students_waiting_context(request, course_id):
 
     course = get_object_or_404(Course, id=course_id)
-    requests = Request.objects.filter(course_id=course_id, status=settings.WAITING)
+    requests = Request.objects.filter(course_id=course_id, status=settings.WAITING).order_by('id')
+    filter_pref = Filter.objects.filter(filter_type__gt=10).order_by('filter_type')
 
-    context = {
-        'course': course,
-        'requests': requests,
-    }
+    results = [[],[],[],[],[],[],[],[],[],[],[]]
+    
 
     if request.method == 'POST':
         is_number_selection_accept_submitted = request.POST.get('selection_number_accept', None)
@@ -354,6 +404,24 @@ def students_waiting_context(request, course_id):
                 #         code='internal_error',
                 #     )
 
+    for key in requests:
+        flag = True
+        for pref in filter_pref:
+            if is_filter_satisfied(key, pref):
+                results[pref.filter_type-11].append(key)
+                flag = False
+                break
+
+        if flag:
+            results[10].append(key)
+
+    iterator = itertools.count(1)
+    context = {
+        'course': course,
+        'requests': requests,
+        'results': results,
+        'iterator': iterator,
+    }
     return context
 
 
