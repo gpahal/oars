@@ -41,100 +41,100 @@
                 Course information
             </div>
             <div class="box-tools pull-right">
-                <button class="btn btn-primary btn-sm" data-widget="collapse"> <span class="fa fa-minus"></span> </button>
+                <button class="btn btn-primary btn-sm" data-widget="collapse"><span class="fa fa-minus"></span></button>
             </div>
         </div>
         <div class="box-body">
             <table class="table table-bordered table-striped table-responsive">
                 <tbody>
-                    <tr>
-                        <td>
-                            Course title
-                        </td>
-                        <td>
-                            {{ course.name }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Course type
-                        </td>
-                        <td>
-                            {{ course.course_type.code }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Course code
-                        </td>
-                        <td>
-                            {{ course.code }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Department
-                        </td>
-                        <td>
-                            {{ course.department.name }} ({{ course.department.code }})
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Professors
-                        </td>
-                        <td>
-                            {% if course.professors.count == 0 %}
-                                -
-                            {% else %}
-                                {% for professor in course.professors.all %}
-                                    {{ professor.get_full_name }}{% if not forloop.last %}, {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Prerequisites
-                        </td>
-                        <td>
-                            {% if course.prerequisites.count == 0 %}
-                                -
-                            {% else %}
-                                {% for prerequisite in course.prerequisites.all %}
-                                    {{ prerequisite.code }}{% if not forloop.last %}, {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Is being offered?
-                        </td>
-                        <td>
-                            {% if course.is_offered %}
-                                Yes
-                            {% else %}
-                                No
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Credits
-                        </td>
-                        <td>
-                            <script> document.write(credits_to_string({{ course.credits }})); </script>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Student limit
-                        </td>
-                        <td>
-                            {{ course.limit }}
-                        </td>
-                    </tr>
+                <tr>
+                    <td>
+                        Course title
+                    </td>
+                    <td>
+                        {{ course.name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Course type
+                    </td>
+                    <td>
+                        {{ course.course_type.code }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Course code
+                    </td>
+                    <td>
+                        {{ course.code }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Department
+                    </td>
+                    <td>
+                        {{ course.department.name }} ({{ course.department.code }})
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Professors
+                    </td>
+                    <td>
+                        {% if course.professors.count == 0 %}
+                            -
+                        {% else %}
+                            {% for professor in course.professors.all %}
+                                {{ professor.get_full_name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Prerequisites
+                    </td>
+                    <td>
+                        {% if course.prerequisites.count == 0 %}
+                            -
+                        {% else %}
+                            {% for prerequisite in course.prerequisites.all %}
+                                {{ prerequisite.code }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Is being offered?
+                    </td>
+                    <td>
+                        {% if course.is_offered %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Credits
+                    </td>
+                    <td>
+                        <script> document.write(credits_to_string({{ course.credits }})); </script>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Student limit
+                    </td>
+                    <td>
+                        {{ course.limit }}
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -142,16 +142,20 @@
 
     <div class="row">
         <div class="col-xs-6 col-md-3">
-            <a class="btn btn-lg btn-flat btn-block btn-success" href="{% url 'dugc:course_filters' course_id=course.id %}">Filters</a>
+            <a class="btn btn-lg btn-flat btn-block btn-success"
+               href="{% url 'dugc:course_filters' course_id=course.id %}">Filters</a>
         </div>
         <div class="col-xs-6 col-md-3">
-            <a class="btn btn-lg btn-flat btn-block btn-success" href="{% url 'dugc:students_waiting' course_id=course.id %}">Waiting list</a>
+            <a class="btn btn-lg btn-flat btn-block btn-success"
+               href="{% url 'dugc:students_waiting' course_id=course.id %}">Waiting list</a>
         </div>
         <div class="col-xs-6 col-md-3">
-            <a class="btn btn-lg btn-flat btn-block btn-success" href="{% url 'dugc:students_accepted' course_id=course.id %}">Accepted list</a>
+            <a class="btn btn-lg btn-flat btn-block btn-success"
+               href="{% url 'dugc:students_accepted' course_id=course.id %}">Accepted list</a>
         </div>
         <div class="col-xs-6 col-md-3">
-            <a class="btn btn-lg btn-flat btn-block btn-success" href="{% url 'dugc:students_rejected' course_id=course.id %}">Rejected list</a>
+            <a class="btn btn-lg btn-flat btn-block btn-success"
+               href="{% url 'dugc:students_rejected' course_id=course.id %}">Rejected list</a>
         </div>
     </div>
 {% endblock %}

@@ -1,6 +1,8 @@
-from oars.models import Department, Student, Professor, CourseType, Course, Request, Filter, CoursePlan
+from oars.models import (Department, Student, Professor, CourseType, Course,
+                         CurrentCourse, PreviousCourse, Request, Filter, CoursePlan)
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.mail import EmailMessage
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 from decimal import Decimal
@@ -16,7 +18,6 @@ def is_number(s):
 
 
 def is_filter_satisfied(request_obj, filter_obj):
-
     student = request_obj.student
 
     if filter_obj.department is not None and student.department != filter_obj.department:
@@ -35,18 +36,24 @@ def is_filter_satisfied(request_obj, filter_obj):
 
 
 def apply_filter(request_obj, filter_obj):
+    if not request_obj.course == filter_obj.course:
+        return
 
-    if int(filter_obj.filter_type) in (settings.ACCEPTED, settings.REJECTED):
-        request_obj.status = filter_obj.filter_type
-    request_obj.save()
+    filter_type = int(filter_obj.filter_type)
+    if filter_type == settings.REJECTED:
+        request_obj.status = filter_type
+    elif filter_type == settings.ACCEPTED:
+        if request_obj.course.limit_exceeded():
+            request_obj.status = filter_type
+        else:
+            request_obj.status = settings.WAITING_LE
 
     return
 
 
 def course_requests_context(request):
-
     course_types = CourseType.objects.all()
-    courses = Course.objects.all()
+    courses = Course.objects.filter(is_offered=True)
 
     if request.method == 'POST':
         is_new_request_submitted = request.POST.get('course_request', None)
@@ -58,16 +65,28 @@ def course_requests_context(request):
     if is_new_request_submitted:
         course_code = request.POST.get('course_code', None)
         if course_code:
-            course = Course.objects.get(id=course_code)
-            request_obj = Request(course=course, student=request.user.student, status=settings.WAITING)
-            filters = Filter.objects.filter(course=course, filter_type__in=(settings.ACCEPTED, settings.REJECTED))
-            for filter_obj in filters:
-                if is_filter_satisfied(request_obj, filter_obj):
-                    apply_filter(request_obj, filter_obj)
+            course = Course.objects.get(id=course_code, is_offered=True)
+            flag = True
+            for prerequisite in course.prerequisites.all():
+                count_previous = PreviousCourse.objects.filter(student=request.user.student, course=prerequisite).count()
+                count_current = CurrentCourse.objects.filter(student=request.user.student, course=prerequisite).count()
+                if count_previous + count_current == 0:
+                    request_obj = Request(course=course, student=request.user.student, status=settings.REJECTED)
+                    request_obj.save()
+                    flag = False
                     break
+            if flag:
+                request_obj = Request(course=course, student=request.user.student, status=settings.WAITING)
+                filters = Filter.objects.filter(course=course, filter_type__in=(settings.ACCEPTED, settings.REJECTED)).order_by('filter_type')
+                for filter_obj in filters:
+                    if is_filter_satisfied(request_obj, filter_obj):
+                        apply_filter(request_obj, filter_obj)
+                        break
+                request_obj.save()
+
         else:
             raise ValidationError(
-                _('Invalid value'),
+                _('Invalid course code'),
                 code='invalid',
             )
 
@@ -79,12 +98,12 @@ def course_requests_context(request):
                 request_obj.delete()
             except:
                 raise ValidationError(
-                    _('Invalid value'),
+                    _('Invalid request id'),
                     code='invalid',
                 )
         else:
             raise ValidationError(
-                _('Invalid value'),
+                _('Invalid request id'),
                 code='invalid',
             )
 
@@ -100,10 +119,10 @@ def course_requests_context(request):
 
     return context
 
-def course_plan_context(request):
 
+def course_plan_context(request):
     course_types = CourseType.objects.all()
-    courses = Course.objects.all()
+    courses = Course.objects.filter(is_offered=True)
 
     if request.method == 'POST':
         is_new_request_submitted = request.POST.get('course_plan', None)
@@ -115,13 +134,13 @@ def course_plan_context(request):
     if is_new_request_submitted:
         course_code = request.POST.get('course_code', None)
         if course_code:
-            course = Course.objects.get(id=course_code)
-            request_obj = CoursePlan(course=course, student=request.user.student )
+            course = Course.objects.get(id=course_code, is_offered=True)
+            request_obj = CoursePlan(course=course, student=request.user.student)
             request_obj.save()
 
         else:
             raise ValidationError(
-                _('Invalid value'),
+                _('Invalid course code'),
                 code='invalid',
             )
 
@@ -133,12 +152,12 @@ def course_plan_context(request):
                 request_obj.delete()
             except:
                 raise ValidationError(
-                    _('Invalid value'),
+                    _('Invalid request id'),
                     code='invalid',
                 )
         else:
             raise ValidationError(
-                _('Invalid value'),
+                _('Invalid request id'),
                 code='invalid',
             )
 
@@ -151,9 +170,10 @@ def course_plan_context(request):
 
     return context
 
-def courses_offered_context(request):
 
-    courses = Course.objects.select_related('professors').filter(professors__id=request.user.professor.id)
+def courses_offered_context(request):
+    courses = Course.objects.select_related('professors').filter(professors__id=request.user.professor.id,
+                                                                 is_offered=True)
     context = {
         'courses': courses,
     }
@@ -162,8 +182,8 @@ def courses_offered_context(request):
 
 
 def courses_offered_dept_context(request):
-
-    courses = Course.objects.select_related('department').filter(department=request.user.professor.department)
+    courses = Course.objects.select_related('department').filter(department=request.user.professor.department,
+                                                                 is_offered=True)
     context = {
         'courses': courses,
     }
@@ -172,7 +192,6 @@ def courses_offered_dept_context(request):
 
 
 def course_context(course_id):
-
     course = get_object_or_404(Course, id=course_id)
     context = {
         'course': course,
@@ -182,7 +201,6 @@ def course_context(course_id):
 
 
 def course_filters_context(request, course_id):
-
     course = get_object_or_404(Course, id=course_id)
     departments = Department.objects.all()
     filters = Filter.objects.select_related('course').filter(course__id=course_id)
@@ -203,7 +221,7 @@ def course_filters_context(request, course_id):
                 department = Department.objects.get(id=department)
             except Department.DoesNotExist:
                 raise ValidationError(
-                    _('Invalid value'),
+                    _('Invalid department'),
                     code='invalid',
                 )
         min_semester = request.POST.get('min_semester', None)
@@ -227,9 +245,11 @@ def course_filters_context(request, course_id):
             filter_obj = Filter(course=course, department=department, min_semester=min_semester,
                                 max_semester=max_semester, min_cpi=min_cpi, filter_type=filter_type)
             requests = Request.objects.filter(course=course, status=settings.WAITING)
-            for request_obj in requests:
-                if is_filter_satisfied(request_obj, filter_obj):
-                    apply_filter(request_obj, filter_obj)
+            if int(filter_type) in (settings.ACCEPTED, settings.REJECTED):
+                for request_obj in requests:
+                    if is_filter_satisfied(request_obj, filter_obj):
+                        apply_filter(request_obj, filter_obj)
+                        request_obj.save()
             filter_obj.save()
         except Exception as e:
             raise ValidationError(
@@ -245,12 +265,12 @@ def course_filters_context(request, course_id):
                 filter_obj.delete()
             except:
                 raise ValidationError(
-                    _('Invalid value'),
+                    _('Invalid filter id'),
                     code='invalid',
                 )
         else:
             raise ValidationError(
-                _('Invalid value'),
+                _('Invalid filter id'),
                 code='invalid',
             )
 
@@ -267,7 +287,6 @@ def course_filters_context(request, course_id):
 
 
 def course_filters_limited_context(request, course_id):
-
     course = get_object_or_404(Course, id=course_id)
     departments = Department.objects.all()
     filters = Filter.objects.select_related('course').filter(course__id=course_id,
@@ -289,7 +308,7 @@ def course_filters_limited_context(request, course_id):
                 department = Department.objects.get(id=department)
             except Department.DoesNotExist:
                 raise ValidationError(
-                    _('Invalid value'),
+                    _('Invalid department'),
                     code='invalid',
                 )
         min_semester = request.POST.get('min_semester', None)
@@ -313,13 +332,15 @@ def course_filters_limited_context(request, course_id):
             filter_obj = Filter(course=course, department=department, min_semester=min_semester,
                                 max_semester=max_semester, min_cpi=min_cpi, filter_type=filter_type)
             requests = Request.objects.filter(course=course, status=settings.WAITING)
-            for request_obj in requests:
-                if is_filter_satisfied(request_obj, filter_obj):
-                    apply_filter(request_obj, filter_obj)
+            if int(filter_type) in (settings.ACCEPTED, settings.REJECTED):
+                for request_obj in requests:
+                    if is_filter_satisfied(request_obj, filter_obj):
+                        apply_filter(request_obj, filter_obj)
+                        request_obj.save()
             filter_obj.save()
-        except:
+        except Exception as e:
             raise ValidationError(
-                _('Invalid value'),
+                _(e.__str__()),
                 code='invalid',
             )
 
@@ -331,12 +352,12 @@ def course_filters_limited_context(request, course_id):
                 filter_obj.delete()
             except:
                 raise ValidationError(
-                    _('Invalid value'),
+                    _('Invalid filter id'),
                     code='invalid',
                 )
         else:
             raise ValidationError(
-                _('Invalid value'),
+                _('Invalid filter id'),
                 code='invalid',
             )
 
@@ -353,30 +374,17 @@ def course_filters_limited_context(request, course_id):
 
 
 def students_waiting_context(request, course_id):
-
     course = get_object_or_404(Course, id=course_id)
-    requests = Request.objects.filter(course_id=course_id, status=settings.WAITING).order_by('id')
-    filter_pref = Filter.objects.filter(filter_type__gt=10).order_by('filter_type')
+    requests = Request.objects.filter(course_id=course_id,
+                                      status__in=(settings.WAITING, settings.WAITING_LE)).order_by('id')
+    filter_pref = Filter.objects.filter(filter_type__gte=10).order_by('filter_type')
 
-    results = [[],[],[],[],[],[],[],[],[],[],[]]
-    
+    results = [[] for x in range(12)]
 
     if request.method == 'POST':
-        is_number_selection_accept_submitted = request.POST.get('selection_number_accept', None)
-        is_number_selection_reject_submitted = request.POST.get('selection_number_reject', None)
         is_selection_submitted = request.POST.get('selection_submit', None)
     else:
-        is_number_selection_accept_submitted = False
-        is_number_selection_reject_submitted = False
         is_selection_submitted = False
-
-    if is_number_selection_accept_submitted or is_number_selection_reject_submitted:
-        selection_type = request.POST.get('selection_type', None)
-        selection_number = request.POST.get('selection_number', None)
-
-        if selection_type and selection_number:
-            # selct the top 'selection_number' from 'selection_type' based on list sorted by preferences
-            pass
 
     if is_selection_submitted:
         for key, value in request.POST.items():
@@ -398,27 +406,30 @@ def students_waiting_context(request, course_id):
                         _('Invalid request id'),
                         code='invalid',
                     )
-                # except:
-                #     raise ValidationError(
-                #         _('Error while applying changes to request id'),
-                #         code='internal_error',
-                #     )
+                except:
+                    raise ValidationError(
+                        _('Error while applying changes to request id'),
+                        code='internal_error',
+                    )
 
     for key in requests:
-        flag = True
-        for pref in filter_pref:
-            if is_filter_satisfied(key, pref):
-                results[pref.filter_type-11].append(key)
-                flag = False
-                break
+        if key.status == settings.WAITING_LE:
+            results[0].append(key)
+        else:
+            flag = True
+            for pref in filter_pref:
+                if is_filter_satisfied(key, pref):
+                    results[pref.filter_type - 10].append(key)
+                    flag = False
+                    break
+            if flag:
+                results[11].append(key)
 
-        if flag:
-            results[10].append(key)
-
-    iterator = itertools.count(1)
+    iterator = itertools.count(1).__next__
     context = {
         'course': course,
         'requests': requests,
+        'request_count': len(requests),
         'results': results,
         'iterator': iterator,
     }
@@ -426,7 +437,6 @@ def students_waiting_context(request, course_id):
 
 
 def students_accepted_context(course_id):
-
     course = get_object_or_404(Course, id=course_id)
     requests = Request.objects.filter(course_id=course_id, status=settings.ACCEPTED)
     context = {
@@ -438,7 +448,6 @@ def students_accepted_context(course_id):
 
 
 def students_rejected_context(course_id):
-
     course = get_object_or_404(Course, id=course_id)
     requests = Request.objects.filter(course_id=course_id, status=settings.REJECTED)
     context = {
@@ -450,8 +459,7 @@ def students_rejected_context(course_id):
 
 
 def course_listing_context():
-
-    courses = Course.objects.all()
+    courses = Course.objects.filter(is_offered=True)
     context = {
         'courses': courses,
     }
@@ -460,10 +468,9 @@ def course_listing_context():
 
 
 def course_search_context(request):
-
     departments = Department.objects.all()
     course_types = CourseType.objects.all()
-    courses = Course.objects.all()
+    courses = Course.objects.filter(is_offered=True)
 
     if request.method == 'POST':
         is_form_submitted = request.POST.get('course_search', None)
@@ -494,7 +501,6 @@ def course_search_context(request):
             professors = Professor.objects.filter(user__email__icontains=professor_email)
             courses = courses.select_related('professors').filter(professors__in=professors)
 
-
     context = {
         'departments': departments,
         'course_types': course_types,
@@ -505,7 +511,6 @@ def course_search_context(request):
 
 
 def mailing_list_context(request):
-
     departments = Department.objects.all()
     emails = []
     display_emails = False
@@ -576,6 +581,13 @@ def mailing_list_context(request):
         if not message:
             message = ""
 
+        email_message = EmailMessage('From '+request.user.get_full_name()+': '+subject, message, request.user.email,
+                                     emails, bcc=bcc_to, cc=cc_to)
+
+        for attachment in request.FILES.getlist('attachments'):
+            email_message.attach(attachment.name, attachment.read(), attachment.content_type)
+
+        email_message.send()
 
     if is_email_list_submitted:
         display_emails = True

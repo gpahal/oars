@@ -53,7 +53,8 @@
                                             {% endfor %}
                                         {% endif %}
                                     </td>
-                                    <td class="text-center"><a href="{% url 'dugc:course_filters' course_id=course.id %}">Filters</a></td>
+                                    <td class="text-center"><a
+                                            href="{% url 'dugc:course_filters' course_id=course.id %}">Filters</a></td>
                                     <td class="text-center">
                                         <a href="{% url 'dugc:students_waiting' course_id=course.id %}">Waiting</a>
                                         &nbsp;&nbsp;&nbsp;&nbsp;

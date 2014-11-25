@@ -15,7 +15,8 @@
 {% block message %}
     {% if logged_in %}
         <p>You have been logged out.</p>
-        <p><a class="btn btn-lg btn-primary btn-flat btn-horizontal-padding" href="{% url 'login' %}">Login again</a></p>
+        <p><a class="btn btn-lg btn-primary btn-flat btn-horizontal-padding" href="{% url 'login' %}">Login again</a>
+        </p>
     {% else %}
         <p>In order to logout, you must be logged in.</p>
         <p><a class="btn btn-flat btn-primary btn-horizontal-padding" href="{% url 'login' %}">Login</a></p>

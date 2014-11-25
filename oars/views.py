@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_protect
 
 # Avoid shadowing the login() and logout() views below.
 from django.contrib.auth import (REDIRECT_FIELD_NAME, login as auth_login,
-    logout as auth_logout, get_user_model, update_session_auth_hash)
+                                 logout as auth_logout, get_user_model, update_session_auth_hash)
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
@@ -22,7 +22,6 @@ from oars.forms import AuthenticationForm
 
 
 def index(request):
-
     if not request.user.is_authenticated():
         redirect_to = resolve_url(settings.LOGIN_URL)
     else:
@@ -104,7 +103,7 @@ def logout(request, next_page=None,
         next_page = resolve_url(next_page)
 
     if (redirect_field_name in request.POST or
-            redirect_field_name in request.GET):
+                redirect_field_name in request.GET):
         next_page = request.POST.get(redirect_field_name,
                                      request.GET.get(redirect_field_name))
         # Security check -- don't allow redirection to a different host.
@@ -125,7 +124,7 @@ def logout(request, next_page=None,
     if extra_context is not None:
         context.update(extra_context)
     return TemplateResponse(request, template_name, context,
-        current_app=current_app)
+                            current_app=current_app)
 
 
 def logout_then_login(request, login_url=None, current_app=None, extra_context=None):
@@ -142,7 +141,7 @@ def logout_then_login(request, login_url=None, current_app=None, extra_context=N
 # - password_reset sends the mail
 # - password_reset_done shows a success message for the above
 # - password_reset_confirm checks the link the user clicked and
-#   prompts for a new password
+# prompts for a new password
 # - password_reset_complete shows a success message for the above
 
 @csrf_protect
@@ -303,7 +302,6 @@ def password_change(request,
 def password_change_done(request,
                          template_name='oars/password_change_done.html',
                          current_app=None, extra_context=None):
-
     if not 'changed_password' in request.session or not request.session['changed_password']:
         raise Http404
     else:

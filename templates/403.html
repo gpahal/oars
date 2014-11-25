@@ -11,13 +11,17 @@
 {% block content %}
     <div class="error-page">
         <h2 class="headline text-info"> 403</h2>
+
         <div class="error-content">
             <h3><span class="fa fa-warning text-yellow"></span> Forbidden (Access Denied)</h3>
+
             <p>Your client does not have permission to get URL <code>{{ request_path }}</code> from this server.</p>
+
             <p>
                 <a class="btn btn-flat btn-info" href="{% url 'index' %}">Home</a>
                 <a class="btn btn-flat btn-info" href="{% url 'logout_then_login' %}">Login as another user</a>
             </p>
-        </div><!-- /.error-content -->
+        </div>
+        <!-- /.error-content -->
     </div><!-- /.error-page -->
 {% endblock %}

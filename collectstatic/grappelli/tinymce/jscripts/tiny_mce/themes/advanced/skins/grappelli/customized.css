@@ -8,15 +8,13 @@
 
 ----------------------------------------------------------------------- */
 
-
-
 /* 	Page Break
 ----------------------------------------------------------------------- */
 
 body#tinymce img.mcePageBreak {
-   display: block;
-   width: 100%;
-   height: 16px;
-   margin-top: 12px;
-   background: #fff url(img/customized/pagebreak.png) 0 0 repeat-x;
+    display: block;
+    width: 100%;
+    height: 16px;
+    margin-top: 12px;
+    background: #fff url(img/customized/pagebreak.png) 0 0 repeat-x;
 }

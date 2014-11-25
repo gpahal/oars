@@ -6,7 +6,7 @@
  * element.onClick fills the ui-timepicker node with the time_list (all times you can select)
  */
 
-(function($) {
+(function ($) {
     $.widget("ui.grp_timepicker", {
         // default options
         options: {
@@ -52,14 +52,14 @@
             // ui.widget will extend/merge the options.time_list with the one you sent.
             time_list: []
         },
-        
+
         // init timepicker for a specific element
-        _create: function() {
+        _create: function () {
             // for the events
             var self = this;
-            
+
             // to close timpicker if you click somewhere in the document
-            $(document).mousedown(function(evt) {
+            $(document).mousedown(function (evt) {
                 if (self.timepicker.is(":visible")) {
                     var $target = $(evt.target);
                     if ($target[0].id != self.timepicker[0].id && $target.parents(self.options.timepicker_selector).length === 0 && !$target.hasClass('hasTimepicker') && !$target.hasClass('ui-timepicker-trigger')) {
@@ -68,37 +68,37 @@
                 }
             });
             // close on esc
-            $(document).keyup(function(e) {
+            $(document).keyup(function (e) {
                 if (e.keyCode == 27) {
                     self.timepicker.hide();
                 }
             });
-            
+
             // get/create timepicker's container
             if ($(this.options.timepicker_selector).size() === 0) {
                 $(this.options.template).appendTo('body');
             }
             this.timepicker = $(this.options.timepicker_selector);
             this.timepicker.hide();
-            
+
             // modify the element and create the button
             this.element.addClass("hasTimepicker");
             this.button = $('<button type="button" class="ui-timepicker-trigger"></button>');
             this.element.after(this.button);
-            
+
             // disable button if element is disabled
             if (this.element.prop("disabled")) {
                 this.button.prop("disabled", true);
             } else {
                 // register event
-                this.button.click(function() {
+                this.button.click(function () {
                     self._toggleTimepicker();
                 });
             }
         },
-        
+
         // called when button is clicked
-        _toggleTimepicker: function() {
+        _toggleTimepicker: function () {
             if (this.timepicker.is(":visible")) {
                 this.timepicker.hide();
             } else {
@@ -107,39 +107,39 @@
                 this._showTimepicker();
             }
         },
-        
+
         // fills timepicker with time_list of element and shows it.
         // called by _toggleTimepicker
-        _generateTimepickerContents: function() {
+        _generateTimepickerContents: function () {
             var self = this,
                 template_str = "<ul>";
-            
+
             // there is no time_list for this instance so use the default one
             if (this.options.time_list.length === 0) {
                 this.options.time_list = this.options.default_time_list;
             }
-            
+
             for (var i = 0; i < this.options.time_list.length; i++) {
                 if (this.options.time_list[i] == "now") {
                     var now = new Date(),
                         hours = now.getHours(),
                         minutes = now.getMinutes();
-                    
+
                     hours = ((hours < 10) ? "0" + hours : hours);
                     minutes = ((minutes < 10) ? "0" + minutes : minutes);
-                    
+
                     template_str += '<li class="ui-state-active row">' + hours + ":" + minutes + '</li>';
                 } else {
                     template_str += '<li class="ui-state-default row">' + this.options.time_list[i] + '</li>';
                 }
             }
             template_str += "</ul>";
-            
+
             // fill timepicker container
             this.timepicker.html(template_str);
-            
+
             // click handler for items (times) in timepicker
-            this.timepicker.find('li').click(function() {
+            this.timepicker.find('li').click(function () {
                 // remove active class from all items
                 $(this).parent().children('li').removeClass("ui-state-active");
                 // mark clicked item as active
@@ -149,20 +149,20 @@
                 self.timepicker.hide();
             });
         },
-        
+
         // sets offset and shows timepicker container
-        _showTimepicker: function() {
+        _showTimepicker: function () {
             var browserHeight = document.documentElement.clientHeight;
             var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
             var tpInputHeight = this.element.outerHeight();
             var tpDialogHeight = this.timepicker.outerHeight() + tpInputHeight;
             var offsetTop = this.element.offset().top;
             var offsetLeft = this.element.offset().left;
-            
+
             // check the remaining space within the viewport
             // 60 counts for fixed header/footer
             var checkSpace = offsetTop - scrollY + tpDialogHeight + 60;
-            
+
             // position timepicker below or above the input
             if (checkSpace < browserHeight) {
                 // place the timepicker below input
@@ -176,11 +176,11 @@
             // show timepicker
             this.timepicker.show();
         },
-        
-        destroy: function() {
+
+        destroy: function () {
             $.Widget.prototype.destroy.apply(this, arguments); // default destroy
             // now do other stuff particular to this widget
         }
-        
+
     });
 })(grp.jQuery);

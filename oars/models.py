@@ -8,7 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class UserManager(BaseUserManager):
-
     def _create_user(self, username, email, password,
                      is_admin, **extra_fields):
         """
@@ -45,21 +44,21 @@ class User(AbstractBaseUser):
     """
 
     username = models.CharField(_('username'), max_length=30, unique=True,
-        help_text=_('Required. 30 characters or fewer. Letters, digits and '
-                    '@/./+/-/_ only.'),
-        validators=[
-            validators.RegexValidator(r'^[\w.@+-]+$', _('Enter a valid username.'), 'invalid')
-        ])
+                                help_text=_('Required. 30 characters or fewer. Letters, digits and '
+                                            '@/./+/-/_ only.'),
+                                validators=[
+                                    validators.RegexValidator(r'^[\w.@+-]+$', _('Enter a valid username.'), 'invalid')
+                                ])
 
     email = models.EmailField(_('email address'))
     full_name = models.CharField(_('first name'), max_length=50, blank=True)
     date_of_birth = models.DateField(_('date of birth'), null=True, blank=True)
     is_admin = models.BooleanField(_('admin status'), default=False,
-        help_text=_('Designates whether the user can log into the admin '
-                    'site.'))
+                                   help_text=_('Designates whether the user can log into the admin '
+                                               'site.'))
     is_active = models.BooleanField(_('active'), default=True,
-        help_text=_('Designates whether this user should be treated as '
-                    'active. Unselect this instead of deleting accounts.'))
+                                    help_text=_('Designates whether this user should be treated as '
+                                                'active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     objects = UserManager()
@@ -139,7 +138,6 @@ class User(AbstractBaseUser):
 
 
 class Profile(models.Model):
-
     user = models.OneToOneField(User)
     user_type = settings.USER_NONE
 
@@ -154,25 +152,24 @@ class Profile(models.Model):
 
 
 class Department(models.Model):
-
     code = models.CharField(max_length=5, unique=True,
-        help_text=_('Required. 5 characters or fewer. Uppercase Letters only. '),
-        validators=[
-            validators.RegexValidator(r'^[A-Z]+$', _('Enter a valid department code.'), 'invalid'),
-        ])
+                            help_text=_('Required. 5 characters or fewer. Uppercase Letters only. '),
+                            validators=[
+                                validators.RegexValidator(r'^[A-Z]+$', _('Enter a valid department code.'), 'invalid'),
+                            ])
     name = models.CharField(max_length=50, unique=True,
-        help_text=_('Required. 50 characters or fewer. Letters, digits, spaces and '
-                    '@/./+/-/_ only.'),
-        validators=[
-            validators.RegexValidator(r'^[ \w.@+-]+$', _('Enter a valid department name.'), 'invalid'),
-        ])
+                            help_text=_('Required. 50 characters or fewer. Letters, digits, spaces and '
+                                        '@/./+/-/_ only.'),
+                            validators=[
+                                validators.RegexValidator(r'^[ \w.@+-]+$', _('Enter a valid department name.'),
+                                                          'invalid'),
+                            ])
 
     def __str__(self):
         return self.code
 
 
 class Student(Profile):
-
     user_type = settings.USER_STUDENT
     department = models.ForeignKey(Department)
     roll_no = models.PositiveSmallIntegerField(
@@ -191,45 +188,42 @@ class Student(Profile):
 
 
 class Professor(Profile):
-
     user_type = settings.USER_PROFESSOR
     department = models.ForeignKey(Department)
 
 
 class DUGC(Profile):
-
     user_type = settings.USER_DUGC
     department = models.OneToOneField(Department, unique=True)
     professor = models.OneToOneField(Professor)
 
 
 class CourseType(models.Model):
-
     code = models.CharField(max_length=5, unique=True,
-        help_text=_('Required. 5 characters or fewer. Uppercase Letters only. '),
-        validators=[
-            validators.RegexValidator(r'^[A-Z]+$', _('Enter a valid course type code.'), 'invalid'),
-        ])
+                            help_text=_('Required. 5 characters or fewer. Uppercase Letters only. '),
+                            validators=[
+                                validators.RegexValidator(r'^[A-Z]+$', _('Enter a valid course type code.'), 'invalid'),
+                            ])
 
     def __str__(self):
         return self.code
 
 
 class Course(models.Model):
-
     department = models.ForeignKey(Department)
     course_type = models.ForeignKey(CourseType)
     code = models.CharField(max_length=7,
-        help_text=_('Required. 5 characters or fewer. Digits and uppercase letters only. '),
-        validators=[
-            validators.RegexValidator(r'^[A-Z]{2,3}[\d]{3}[A-Z]?$', _('Enter a valid course code.'), 'invalid'),
-        ])
+                            help_text=_('Required. 5 characters or fewer. Digits and uppercase letters only. '),
+                            validators=[
+                                validators.RegexValidator(r'^[A-Z]{2,3}[\d]{3}[A-Z]?$', _('Enter a valid course code.'),
+                                                          'invalid'),
+                            ])
     name = models.CharField(max_length=50,
-        help_text=_('Required. 50 characters or fewer. Letters, digits, spaces and '
-                    '@/./+/-/_ only.'),
-        validators=[
-            validators.RegexValidator(r'^[ \w.@+-]+$', _('Enter a valid course name.'), 'invalid'),
-        ])
+                            help_text=_('Required. 50 characters or fewer. Letters, digits, spaces and '
+                                        '@/./+/-/_ only.'),
+                            validators=[
+                                validators.RegexValidator(r'^[ \w.@+-]+$', _('Enter a valid course name.'), 'invalid'),
+                            ])
     professors = models.ManyToManyField(Professor)
     prerequisites = models.ManyToManyField("self", blank=True)
     schedule = models.CommaSeparatedIntegerField(max_length=70, default='101162,102162,104162')
@@ -247,9 +241,12 @@ class Course(models.Model):
     def __str__(self):
         return self.code
 
+    def limit_exceeded(self):
+        student_count = Request.objects.filter(course=self, status=settings.ACCEPTED)
+        return student_count >= self.limit
+
 
 class CurrentCourse(models.Model):
-
     course = models.ForeignKey(Course)
     student = models.ForeignKey(Student)
 
@@ -261,7 +258,6 @@ class CurrentCourse(models.Model):
 
 
 class PreviousCourse(models.Model):
-
     course = models.ForeignKey(Course)
     student = models.ForeignKey(Student)
     grade = models.PositiveSmallIntegerField(
@@ -278,11 +274,9 @@ class PreviousCourse(models.Model):
 
 
 class Request(models.Model):
-
     course = models.ForeignKey(Course)
     student = models.ForeignKey(Student)
     status = models.PositiveSmallIntegerField(choices=settings.REQUEST_STATUS_CHOICES, default=settings.WAITING)
-    limit_exceeded = models.BooleanField(default=False)
 
     class Meta:
         unique_together = (('course', 'student'),)
@@ -290,8 +284,8 @@ class Request(models.Model):
     def __str__(self):
         return "%s - %s" % (self.student, self.course)
 
-class CoursePlan(models.Model):
 
+class CoursePlan(models.Model):
     course = models.ForeignKey(Course)
     student = models.ForeignKey(Student)
 
@@ -303,7 +297,6 @@ class CoursePlan(models.Model):
 
 
 class Filter(models.Model):
-
     course = models.ForeignKey(Course)
     department = models.ForeignKey(Department, blank=True, null=True)
     min_semester = models.PositiveSmallIntegerField(

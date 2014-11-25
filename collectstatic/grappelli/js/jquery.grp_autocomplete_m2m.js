@@ -4,12 +4,12 @@
  */
 
 
-(function($){
-    
+(function ($) {
+
     var methods = {
-        init: function(options) {
+        init: function (options) {
             options = $.extend({}, $.fn.grp_autocomplete_m2m.defaults, options);
-            return this.each(function() {
+            return this.each(function () {
                 var $this = $(this);
                 // assign attributes
                 $this.attr({
@@ -36,15 +36,15 @@
                 // lookup
                 lookup_id($this, options);  // lookup when loading page
                 lookup_autocomplete($this, options);  // autocomplete-handler
-                $this.bind("change focus keyup", function() { // id-handler
+                $this.bind("change focus keyup", function () { // id-handler
                     lookup_id($this, options);
                 });
                 // labels
-                $("label[for='"+$this.attr('id')+"']").each(function() {
-                    $(this).attr("for", $this.attr("id")+"-autocomplete");
+                $("label[for='" + $this.attr('id') + "']").each(function () {
+                    $(this).attr("for", $this.attr("id") + "-autocomplete");
                 });
                 // click on div > focus input
-                options.wrapper_autocomplete.bind("click", function(e) {
+                options.wrapper_autocomplete.bind("click", function (e) {
                     // prevent focus when clicking on remove/select
                     if (!$(e.target).hasClass("related-lookup") && !$(e.target).hasClass("grp-related-remove")) {
                         options.wrapper_search.find("input:first").focus();
@@ -53,88 +53,88 @@
             });
         }
     };
-    
-    $.fn.grp_autocomplete_m2m = function(method) {
+
+    $.fn.grp_autocomplete_m2m = function (method) {
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        } else if (typeof method === 'object' || ! method) {
+        } else if (typeof method === 'object' || !method) {
             return methods.init.apply(this, arguments);
         } else {
-            $.error('Method ' +  method + ' does not exist on jQuery.grp_autocomplete_m2m');
+            $.error('Method ' + method + ' does not exist on jQuery.grp_autocomplete_m2m');
         }
         return false;
     };
-    
-    var value_add = function(elem, value, options) {
+
+    var value_add = function (elem, value, options) {
         var values = [];
         if (elem.val()) values = elem.val().split(",");
         values.push(value);
         elem.val(values.join(","));
         return values.join(",");
     };
-    
-    var value_remove = function(elem, position, options) {
+
+    var value_remove = function (elem, position, options) {
         var values = [];
         if (elem.val()) values = elem.val().split(",");
-        values.splice(position,1);
+        values.splice(position, 1);
         elem.val(values.join(","));
         return values.join(",");
     };
-    
-    var loader = function() {
+
+    var loader = function () {
         var loader = $('<div class="grp-loader">loader</div>');
         return loader;
     };
-    
-    var remove_link = function(id) {
+
+    var remove_link = function (id) {
         var removelink = $('<a class="grp-related-remove"></a>');
-        removelink.attr('id', 'remove_'+id);
+        removelink.attr('id', 'remove_' + id);
         removelink.attr('href', 'javascript://');
         removelink.attr('onClick', 'return removeRelatedObject(this);');
-        removelink.hover(function() {
+        removelink.hover(function () {
             $(this).parent().toggleClass("grp-autocomplete-preremove");
         });
         return removelink;
     };
-    
-    var repr_add = function(elem, label, options) {
+
+    var repr_add = function (elem, label, options) {
         var repr = $('<li class="grp-repr"></li>');
         var removelink = $('<a class="grp-m2m-remove" href="javascript://">' + label + '</a>');
         repr.append(removelink);
         repr.insertBefore(options.wrapper_search);
-        removelink.bind("click", function(e) { // remove-handler
+        removelink.bind("click", function (e) { // remove-handler
             var pos = $(this).parent().parent().children("li").index($(this).parent());
             value_remove(elem, pos, options);
             $(this).parent().remove();
             elem.val() ? $(options.remove_link).show() : $(options.remove_link).hide();
             e.stopPropagation(); // prevent focus on input
         });
-        removelink.hover(function() {
+        removelink.hover(function () {
             $(this).parent().toggleClass("grp-autocomplete-preremove");
         });
     };
-    
-    var lookup_autocomplete = function(elem, options) {
+
+    var lookup_autocomplete = function (elem, options) {
         options.wrapper_search.find("input:first")
-            .bind("keydown", function(event) { // don't navigate away from the field on tab when selecting an item
+            .bind("keydown", function (event) { // don't navigate away from the field on tab when selecting an item
                 if (event.keyCode === $.ui.keyCode.TAB && $(this).data("uiAutocomplete").menu.active) {
                     event.preventDefault();
                 }
             })
-            .bind("focus", function() {
+            .bind("focus", function () {
                 options.wrapper_autocomplete.addClass("grp-state-focus");
             })
-            .bind("blur", function() {
+            .bind("blur", function () {
                 options.wrapper_autocomplete.removeClass("grp-state-focus");
             })
             .autocomplete({
                 minLength: 1,
                 delay: 1000,
                 position: {my: "left top", at: "left bottom", of: options.wrapper_autocomplete},
-                open: function(event, ui) {
-                    $(".ui-menu").width(options.wrapper_autocomplete.outerWidth()-6);
+                open: function (event, ui) {
+                    $(".ui-menu").width(options.wrapper_autocomplete.outerWidth() - 6);
                 },
-                source: function(request, response) {
+                source: function (request, response) {
                     $.ajax({
                         url: options.autocomplete_lookup_url,
                         dataType: 'json',
@@ -142,8 +142,8 @@
                         beforeSend: function (XMLHttpRequest) {
                             options.loader.show();
                         },
-                        success: function(data){
-                            response($.map(data, function(item) {
+                        success: function (data) {
+                            response($.map(data, function (item) {
                                 return {label: item.label, value: item.value};
                             }));
                         },
@@ -152,10 +152,10 @@
                         }
                     });
                 },
-                focus: function() { // prevent value inserted on focus
+                focus: function () { // prevent value inserted on focus
                     return false;
                 },
-                select: function(event, ui) { // add repr, add value
+                select: function (event, ui) { // add repr, add value
                     repr_add(elem, ui.item.label, options);
                     value_add(elem, ui.item.value, options);
                     elem.val() ? $(options.remove_link).show() : $(options.remove_link).hide();
@@ -163,30 +163,30 @@
                     return false;
                 }
             })
-            .data("ui-autocomplete")._renderItem = function(ul,item) {
-                if (!item.value) {
-                    return $("<li></li>")
-                        .data( "item.autocomplete", item )
-                        .append( "<span class='error'>" + item.label + "</span>")
-                        .appendTo(ul);
-                } else {
-                    return $("<li></li>")
-                        .data( "item.autocomplete", item )
-                        .append( "<a>" + item.label + "</a>")
-                        .appendTo(ul);
-                }
-            };
+            .data("ui-autocomplete")._renderItem = function (ul, item) {
+            if (!item.value) {
+                return $("<li></li>")
+                    .data("item.autocomplete", item)
+                    .append("<span class='error'>" + item.label + "</span>")
+                    .appendTo(ul);
+            } else {
+                return $("<li></li>")
+                    .data("item.autocomplete", item)
+                    .append("<a>" + item.label + "</a>")
+                    .appendTo(ul);
+            }
+        };
     };
-    
-    var lookup_id = function(elem, options) {
+
+    var lookup_id = function (elem, options) {
         $.getJSON(options.lookup_url, {
             object_id: elem.val(),
             app_label: grappelli.get_app_label(elem),
             model_name: grappelli.get_model_name(elem)
-        }, function(data) {
+        }, function (data) {
             options.wrapper_repr.find("li.grp-repr").remove();
             options.wrapper_search.find("input").val("");
-            $.each(data, function(index) {
+            $.each(data, function (index) {
                 if (data[index].value) repr_add(elem, data[index].label, options);
             });
             elem.val() ? $(options.remove_link).show() : $(options.remove_link).hide();

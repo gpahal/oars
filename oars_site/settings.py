@@ -103,7 +103,7 @@ STATICFILES_FINDERS = (
 )
 
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR,  'templates'),
+    os.path.join(BASE_DIR, 'templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -161,9 +161,11 @@ EMAIL_PORT = 587
 WAITING = 0
 ACCEPTED = 1
 REJECTED = 2
+WAITING_LE = 4
 
 REQUEST_STATUS_CHOICES = (
     (WAITING, 'Waiting'),
     (ACCEPTED, 'Accepted'),
     (REJECTED, 'Rejected'),
+    (WAITING_LE, 'Waiting (limit exceeded)'),
 )

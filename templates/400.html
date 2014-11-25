@@ -11,10 +11,15 @@
 {% block message %}
     <div class="error-page">
         <h2 class="headline text-info"> 400</h2>
+
         <div class="error-content">
             <h3><span class="fa fa-warning text-yellow"></span> Bad Request</h3>
-            <p>The request could not be understood by the server due to malformed syntax. The client should not repeat the request without modifications.</p>
+
+            <p>The request could not be understood by the server due to malformed syntax. The client should not repeat
+                the request without modifications.</p>
+
             <p><a class="btn btn-flat btn-info" href="{% url 'index' %}">Home</a></p>
-        </div><!-- /.error-content -->
+        </div>
+        <!-- /.error-content -->
     </div><!-- /.error-page -->
 {% endblock %}

@@ -280,17 +280,31 @@ img {
 .hide {
   display: none !important;
 }
+/* Add border */
+.border {
+    border: 2px solid #dddddd;
+    border-radius: 3px;
+    margin: 5px 0;
+}
+.border-top {
+    border-bottom: 1px solid #dddddd;
+    padding: 7px;
+}
+.border-bottom {
+    border-top: 1px solid #dddddd;
+    padding: 7px;
+}
 /* Remove borders */
 .no-border {
-  border: 0px !important;
+  border: 0 !important;
 }
 /* Remove padding */
 .no-padding {
-  padding: 0px !important;
+  padding: 0 !important;
 }
 /* Remove margins */
 .no-margin {
-  margin: 0px !important;
+  margin: 0 !important;
 }
 /* Remove box shadow */
 .no-shadow {
@@ -1077,7 +1091,7 @@ body > .header .logo .icon {
 }
 .small-box h3,
 .small-box p {
-  z-index: 5px;
+  z-index: 5;
 }
 .small-box .icon {
   position: absolute;
@@ -1545,7 +1559,7 @@ Component: timeline
 .timeline:before {
   content: '';
   position: absolute;
-  top: 0px;
+  top: 0;
   bottom: 0;
   width: 5px;
   background: #ddd;
@@ -2062,17 +2076,6 @@ Component: timeline
   .mailbox .search-form {
     margin-top: 10px;
   }
-}
-/*
-    Page: locked screen
-*/
-/* ADD THIS CLASS TO THE <HTML> TAG */
-.lockscreen {
-  background: url(../img/blur-background09.jpg) repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
 }
 /* Remove the background from the body element */
 .lockscreen > body {

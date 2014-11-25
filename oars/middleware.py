@@ -11,6 +11,7 @@ class RestrictAccessMiddleware(object):
     matching URL patterns. Restricts access for Students, Professors, DUGC's
     and other users.
     """
+
     def __init__(self):
         self.student = re.compile(settings.STUDENT_ACCESS_URL)
         self.professor = re.compile(settings.PROFESSOR_ACCESS_URL)

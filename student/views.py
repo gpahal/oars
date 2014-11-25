@@ -6,7 +6,6 @@ from oars import course_listing_context, course_search_context, course_requests_
 
 
 def context_wrapper(request, context):
-
     context['usertype'] = 'Student'
     context['user'] = request.user
 
@@ -14,39 +13,34 @@ def context_wrapper(request, context):
 
 
 def index(request):
-
     return HttpResponseRedirect(reverse('student:profile'))
 
 
 def profile(request, template_name='student/profile.html'):
-
     context = context_wrapper(request, {})
 
     return TemplateResponse(request, template_name, context=context)
 
 
 def course_requests(request, template_name='student/course_requests.html'):
-
     context = context_wrapper(request, course_requests_context(request))
 
     return TemplateResponse(request, template_name, context=context)
 
-def course_plan(request, template_name='student/course_plan.html'):
 
+def course_plan(request, template_name='student/course_plan.html'):
     context = context_wrapper(request, course_plan_context(request))
 
     return TemplateResponse(request, template_name, context=context)
 
 
 def course_listing(request, template_name='student/course_listing.html'):
-
     context = context_wrapper(request, course_listing_context())
 
     return TemplateResponse(request, template_name, context=context)
 
 
 def course_search(request, template_name='student/course_search.html'):
-
     context = context_wrapper(request, course_search_context(request))
 
     return TemplateResponse(request, template_name, context=context)
