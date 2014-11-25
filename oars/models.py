@@ -277,7 +277,7 @@ class Request(models.Model):
     course = models.ForeignKey(Course)
     student = models.ForeignKey(Student)
     status = models.PositiveSmallIntegerField(choices=settings.REQUEST_STATUS_CHOICES, default=settings.WAITING)
-
+    added = models.BooleanField(default=False)
     class Meta:
         unique_together = (('course', 'student'),)
 

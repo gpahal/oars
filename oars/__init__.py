@@ -119,6 +119,28 @@ def course_requests_context(request):
 
     return context
 
+def course_submit_context(request):
+    
+    if request.method == 'POST':
+        is_new_course_added = request.POST.get('course_submit', None)
+    else:
+        is_new_course_added = False
+
+    if is_new_course_added:
+        request_id = request.POST.get('request_id', None)
+        if request_id:
+            request_obj = Request.objects.get(id=request_id)
+            if request_obj.status == settings.ACCEPTED:
+                request_obj.added = True
+                request_obj.save()
+
+    requests = Request.objects.filter(student=request.user.student,status=settings.ACCEPTED)
+    added_courses = Request.objects.filter(student=request.user.student,added=True)
+    context = {
+        'requests' : requests,
+        'courses' : added_courses,
+    }
+    return context
 
 def course_plan_context(request):
     course_types = CourseType.objects.all()

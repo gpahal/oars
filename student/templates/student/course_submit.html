@@ -1,0 +1,182 @@
+{% extends 'student/base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}Course Request{% endblock %}
+
+{% block extrastyle %}
+    <link type="text/css" rel="stylesheet" href="{% static 'css/vendor/chosen/chosen.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+    <script type="text/javascript">
+        function credits_to_string(credits) {
+            var p = credits % 10;
+            var t = (Math.floor(credits / 10)) % 10;
+            var l = Math.floor(credits / 100);
+            var total_credits = l + t + p;
+            return l.toString() + '-' + t.toString() + '-' + p.toString() + '-' + total_credits.toString();
+        }
+    </script>
+{% endblock %}
+
+{% block heading %}Course Request{% endblock %}
+
+{% block relative-address %}
+    <li class="active">Course Request</li>
+{% endblock %}
+
+{% block request-class %}active{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-solid box-primary">
+                <div class="box-header">
+                    <div class="box-title">Added Courses</div>
+                    <div class="box-tools pull-right">
+                        <button class="btn btn-primary btn-sm" data-widget="collapse"><span
+                                class="fa fa-minus"></span></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+
+                <div class="box-body table-responsive">
+                    <table id="course-listing" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th class="col-md-1">#</th>
+                            <th class="col-md-2">Course code</th>
+                            <th class="col-md-4">Course title</th>
+                            <th class="col-md-2">Credits</th>
+                            <th class="col-md-1 text-center">Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for request in courses %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ request.course.code }}</td>
+                                <td>{{ request.course.name }}</td>
+                                <td>
+                                    <script> document.write(credits_to_string({{ request.course.credits }})); </script>
+                                </td>
+                                <td class="text-center">
+                                    <form role="form" name="request_delete_form"
+                                          action="{% url 'student:course_requests' %}" method="post">
+                                        {% csrf_token %}
+                                        <input value="{{ request.id }}" name="request_id" type="hidden">
+                                        <input type="submit" name="request_delete"
+                                               class="btn btn-flat btn-sm btn-danger"
+                                               value="Delete">
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %} 
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-solid box-primary">
+                <div class="box-header">
+                    <div class="box-title">Add a new Course</div>
+                    <div class="box-tools pull-right">
+                        <button class="btn btn-primary btn-sm" data-widget="collapse"><span
+                                class="fa fa-minus"></span>
+                        </button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+
+
+                <form role="form" name="course_add_form" action="{% url 'student:course_submit' %}"
+                      method="post">
+                    {% csrf_token %}
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12 col-md-4">
+                                <div class="border">
+                                    <div class="border-top">
+                                        <strong>Course code</strong>
+                                    </div>
+                                    <div id="course_code" class="border-bottom">
+                                        <select id="id_course_code" onchange="course_code_select()"
+                                                name="request_id"
+                                                class="chosen-select input-lg" style="min-width:100px; max-width: 300px; width: 90%;"
+                                                data-placeholder="Select course Type">
+                                            <option value=""></option>
+                                            {% for request in requests %}
+                                                <option value="{{ request.id }}">{{ request.course.code }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-md-4">
+                                <div class="border">
+                                    <div class="border-top">
+                                        <strong>Course title</strong>
+                                    </div>
+                                    <div id="course_name" class="border-bottom">
+                                        ---
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-md-4">
+                                <div class="border">
+                                    <div class="border-top">
+                                        <strong>Course credits</strong>
+                                    </div>
+                                    <div id="course_credits" class="border-bottom">
+                                        ---
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <div class="row">
+                            <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+                                <input type="submit" name="add_course"
+                                       class="btn btn-lg btn-flat btn-success btn-block" value="Add Course">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extrascripts %}
+    <script src="{% static 'js/vendor/chosen/chosen.jquery.js' %}" type="text/javascript"></script>
+    <script>
+
+        var courses = {};
+
+        {% for course in requests %}
+            
+            courses[{{course.id}}] = { 'code': '{{course.course.code}}', 'name': '{{course.course.name}}', 'credits': {{course.course.credits}} };
+
+        {% endfor %}
+
+        function course_code_select() {
+            var my_select = document.getElementById("id_course_code");
+            var course_type = my_select.options[my_select.selectedIndex].value;
+            var course_array = courses[course_type];
+            document.getElementById('course_name').innerHTML = course_array['name'];
+            document.getElementById('course_credits').innerHTML = credits_to_string(course_array['credits']);
+        }
+
+        $(document).ready(function () {
+            $('.chosen-select').chosen({no_results_text: 'No results found!', allow_single_deselect: true});
+        });
+
+    </script>
+{% endblock %}
