@@ -18,8 +18,14 @@
     </li>
     <li class="{% block request-class %}{% endblock %}">
         <a href="{% url 'dugc:request_submit' %}">
-            <span class="fa fa-check-square"></span>
+            <span class="fa fa-list-alt"></span>
             <span>Submitted Requests</span>
+        </a>
+    </li>
+    <li class="{% block mailing-list-class %}{% endblock %}">
+        <a href="{% url 'dugc:mailing_list' %}">
+            <span class="fa fa-envelope"></span>
+            <span>Mailing list</span>
         </a>
     </li>
     <li class="treeview {% block courses-class %}{% endblock %}">

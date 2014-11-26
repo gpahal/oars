@@ -19,6 +19,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 
 from oars.forms import AuthenticationForm
+from oars.models import Course
 
 
 def index(request):
@@ -314,3 +315,12 @@ def password_change_done(request,
         context.update(extra_context)
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
+
+
+@login_required
+def course(request, course_id, template_name='common/course.html'):
+    try:
+        course_obj = Course.objects.get(id=course_id)
+    except Course.DoesNotExist:
+        raise Http404
+    return TemplateResponse(request, template_name, {'course': course_obj})

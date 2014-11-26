@@ -171,7 +171,7 @@
                         </thead>
                         <tbody>
                         {% for course in courses %}
-                            <tr>
+                            <tr class="clickable" href="{% url 'course' course_id=course.id %}">
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ course.code }}</td>
                                 <td>{{ course.name }}</td>
@@ -209,6 +209,10 @@
                     [20, 50, 100, -1],
                     [20, 50, 100, "All"]
                 ]
+            });
+
+            $('.clickable').on('click', function() {
+               window.open($(this).attr('href'),"","width=600, height=600, resizable=yes");
             });
         });
     </script>

@@ -4,7 +4,8 @@ from django.core.urlresolvers import reverse
 
 from oars import (courses_offered_dept_context, course_context,
                   students_waiting_context, students_accepted_context, students_rejected_context,
-                  course_filters_limited_context, course_listing_context, course_search_context, submitted_request_context,submitted_view_request)
+                  course_filters_limited_context, course_listing_context, course_search_context,
+                  submitted_request_context, submitted_view_request, mailing_list_context)
 
 
 def context_wrapper(request, context):
@@ -60,6 +61,12 @@ def students_rejected(request, course_id=None, template_name='dugc/students_reje
     return TemplateResponse(request, template_name, context=context)
 
 
+def request_submit(request, template_name='dugc/request_submit.html'):
+    context = context_wrapper(request, submitted_request_context(request))
+
+    return TemplateResponse(request, template_name, context=context)
+
+
 def course_listing(request, template_name='dugc/course_listing.html'):
     context = context_wrapper(request, course_listing_context())
 
@@ -71,12 +78,14 @@ def course_search(request, template_name='dugc/course_search.html'):
 
     return TemplateResponse(request, template_name, context=context)
 
-def request_submit(request, template_name='dugc/request_submit.html'):
-    context = context_wrapper(request, submitted_request_context(request))
+
+def mailing_list(request, template_name='dugc/mailing_list.html'):
+    context = context_wrapper(request, mailing_list_context(request))
 
     return TemplateResponse(request, template_name, context=context)
 
-def request(request, request_id=None, template_name='dugc/request_credentials.html'):
+
+def request_view(request, request_id=None, template_name='dugc/request_credentials.html'):
     context = context_wrapper(request, submitted_view_request(request, request_id))
 
     return TemplateResponse(request, template_name, context=context)

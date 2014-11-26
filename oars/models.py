@@ -247,7 +247,7 @@ class Course(models.Model):
     is_current_course = models.BooleanField(default=False)
     credits = models.PositiveSmallIntegerField(
         validators=[
-            validators.MinValueValidator(100),
+            validators.MinValueValidator(1),
             validators.MaxValueValidator(999),
         ])
     limit = models.PositiveSmallIntegerField(

@@ -15,4 +15,5 @@ urlpatterns = patterns('',
                            views.password_reset_confirm,
                            name='password_reset_confirm'),
                        url(r'^reset/done/$', views.password_reset_complete, name='password_reset_complete'),
+                       url(r'^common/course/(?P<course_id>\d+)/', views.course, name='course'),
                        )

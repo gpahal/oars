@@ -1,0 +1,219 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en-us"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang="en-us"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang="en-us"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en-us"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>OARS | {% block title %}{% endblock %}</title>
+    <meta name="description" content="OARS - Course Allocation System">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="NONE,NOARCHIVE"/>
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        (function ($) {
+            $(function () {
+                if ($('body').css('color') !== 'rgb(51, 51, 51)') {
+                    $('head').prepend('<link rel="stylesheet" href="{% static 'css/vendor/bootstrap.min.css' %}">');
+                }
+            });
+        })(window.jQuery);
+    </script>
+    <link href="{% static "css/AdminLTE.css" %}" rel="stylesheet" type="text/css">
+
+    {% block extrastyle %}{% endblock %}
+
+    <!--[if lt IE 9]>
+            <script src="{% static 'js/vendor/html5-3.6-respond-1.1.0.min.js' %}"></script>
+        <![endif]-->
+
+    <script type="text/javascript">
+        function credits_to_string(credits) {
+            var p = credits % 10;
+            var t = (Math.floor(credits / 10)) % 10;
+            var l = Math.floor(credits / 100);
+            var total_credits = l + t + p;
+            return l.toString() + '-' + t.toString() + '-' + p.toString() + '-' + total_credits.toString();
+        }
+    </script>
+</head>
+
+<body class="fixed">
+    <br>
+    <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+        <div class="box box-solid box-primary">
+            <div class="box-header">
+                <div class="box-title">
+                    Course information: {{ course.code }}
+                </div>
+                <div class="box-tools pull-right">
+                    <button class="btn btn-primary btn-sm" data-widget="collapse"><span class="fa fa-minus"></span></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <table class="table table-bordered table-striped table-responsive">
+                    <tbody>
+                    <tr>
+                        <td>
+                            Course title
+                        </td>
+                        <td>
+                            {{ course.name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Course type
+                        </td>
+                        <td>
+                            {{ course.course_type.code }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Course code
+                        </td>
+                        <td>
+                            {{ course.code }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Department
+                        </td>
+                        <td>
+                            {{ course.department.name }} ({{ course.department.code }})
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Professors
+                        </td>
+                        <td>
+                            {% if course.professors.count == 0 %}
+                                -
+                            {% else %}
+                                {% for professor in course.professors.all %}
+                                    {{ professor.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Prerequisites
+                        </td>
+                        <td>
+                            {% if course.prerequisites.count == 0 %}
+                                -
+                            {% else %}
+                                {% for prerequisite in course.prerequisites.all %}
+                                    {{ prerequisite.code }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Schedule
+                        </td>
+                        <td id="schedule">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Is being offered?
+                        </td>
+                        <td>
+                            {% if course.is_offered %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Credits
+                        </td>
+                        <td>
+                            <script> document.write(credits_to_string({{ course.credits }})); </script>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Student limit
+                        </td>
+                        <td>
+                            {{ course.limit }}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="{% static "js/vendor/jquery-1.11.1.min.js" %}"><\/script>')</script>
+
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script>window.jQuery.fn.modal || document.write('<script src="{% static "js/vendor/bootstrap.min.js" %}"><\/script>')</script>
+
+    <script src="{% static "js/AdminLTE.js" %}"></script>
+
+    <script type="text/javascript">
+        function zeroPad(num, places) {
+            var zero = places - num.toString().length + 1;
+            return new Array(+(zero > 0 && zero)).join("0") + num;
+        }
+
+        $(document).ready(function() {
+            var a = '{{ course.schedule }}'.split(',');
+            var str = ["", "", ""];
+            for (var i = 0; i < a.length; i++) {
+                var type = parseInt(a[i][0]);
+                var day = parseInt(a[i].substring(1, 3));
+                var time = parseInt(a[i].substring(3, 5)) - 16;
+                var duration = parseInt(a[i][5]);
+                console.log(type);
+                // Days
+                if (day % 2 == 1) {
+                    str[type-1] += "MON (" + zeroPad((time+16)*50, 4) + "-" + zeroPad((time+16+duration)*50, 4) + "), ";
+                }
+                day = day / 2;
+                if (day % 2 == 1) {
+                    str[type-1] += "TUE (" + zeroPad((time+16)*50, 4) + "-" + zeroPad((time+16+duration)*50, 4) + "), ";
+                }
+                day = day / 2;
+                if (day % 2 == 1) {
+                    str[type-1] += "WED (" + zeroPad((time+16)*50, 4) + "-" + zeroPad((time+16+duration)*50, 4) + "), ";
+                }
+                day = day / 2;
+                if (day % 2 == 1) {
+                    str[type-1] += "THU (" + zeroPad((time+16)*50, 4) + "-" + zeroPad((time+16+duration)*50, 4) + "), ";
+                }
+                day = day / 2;
+                if (day % 2 == 1) {
+                    str[type-1] += "FRI (" + zeroPad((time+16)*50, 4) + "-" + zeroPad((time+16+duration)*50, 4) + "), ";
+                }
+            }
+            var schedule = "";
+            if (str[0] != "") {
+                schedule += "Lecture: " + str[0] + "<br>";
+            }
+            if (str[1] != "") {
+                schedule += "Tutorial: " + str[1] + "<br>";
+            }
+            if (str[2] != "") {
+                schedule += "Lab: " + str[2] + "<br>";
+            }
+            $('#schedule').html(schedule);
+        });
+    </script>
+</body>

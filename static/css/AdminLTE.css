@@ -65,6 +65,11 @@ body > .header {
   width: 220px;
   top: 0;
 }
+
+.clickable {
+    cursor: pointer;
+}
+
 @media screen and (min-width: 992px) {
   .left-side {
     top: 50px;

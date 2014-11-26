@@ -1,0 +1,477 @@
+{% extends 'dugc/base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}Mailing list{% endblock %}
+
+{% block extrastyle %}
+    <link type="text/css" rel="stylesheet" href="{% static 'css/vendor/chosen/chosen.css' %}">
+    <style type="text/css">
+        form fieldset {
+            padding: 10px 25px 25px 25px;
+            border: 1px solid #cccccc;
+            border-radius: 10px;
+            background-color: #e0e0e0;
+        }
+
+        form fieldset h2 span, p span.link {
+            background-color: #e0e0e0;
+            color: #038cd0;
+        }
+
+        hr {
+            border-width: 2px 0;
+            border-radius: 2px;
+            border-color: #c0c0c0;
+        }
+
+        input[type=submit] {
+            font-size: 1.5em;
+        }
+
+        div.chosen-container {
+            padding: 0;
+        }
+
+        .chosen-container a.chosen-single {
+            height: 46px;
+            line-height: 46px;
+            vertical-align: middle;
+            font-size: 1.3em;
+        }
+
+        .chosen-container a.chosen-single abbr {
+            top: 17px;
+        }
+
+        .chosen-container a.chosen-single div {
+            top: 11px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        form div.attachment, form div.attachment:hover {
+            position: relative;
+            cursor: pointer;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        form div.attachment span.input-group-btn, form div.attachment:hover span.input-group-btn {
+            position: relative;
+            z-index: 1;
+        }
+
+        div.attachment input[type=file], div.attachment input[type=file]:focus, div.attachment input[type=file]:hover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: inherit;
+            height: inherit;
+            opacity: 0;
+            filter: alpha(opacity=0);
+            z-index: 2;
+            outline: 0;
+        }
+
+        div.attachment input[type=text], div.attachment input[type=text]:focus, div.attachment input[type=text]:hover {
+            position: relative;
+            top: 0;
+            left: 0;
+            z-index: 3;
+        }
+    </style>
+{% endblock %}
+
+{% block heading %}Mailing list{% endblock %}
+
+{% block heading-small %}
+    Filter students and send mail
+{% endblock %}
+
+{% block relative-address %}
+    <li class="active">Mailing list</li>
+{% endblock %}
+
+{% block mailing-list-class %}active{% endblock %}
+
+{% block content %}
+    <form role="form" name="mailing_list_form" action="{% url 'dugc:mailing_list' %}" method="post"
+          enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+            <fieldset>
+
+                <div>
+                    <h2 class="text-center">
+                        Student Filter
+                    </h2>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="fieldWrapper form-group">
+                            <select id="id_department" name="department" class="chosen-select form-control input-lg"
+                                    data-placeholder="Select department">
+                                <option value=""></option>
+                                {% for department in departments %}
+                                    <option value="{{ department.id }}">{{ department.code }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="fieldWrapper form-group">
+                            <select id="id_min_semester" name="min_semester"
+                                    class="chosen-select form-control input-lg"
+                                    data-placeholder="Select min. semester">
+                                <option value=""></option>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                                <option>6</option>
+                                <option>7</option>
+                                <option>8</option>
+                                <option>9</option>
+                                <option>10</option>
+                                <option>11</option>
+                                <option>12</option>
+                                <option>13</option>
+                                <option>14</option>
+                                <option>15</option>
+                                <option>16</option>
+                                <option>17</option>
+                                <option>18</option>
+                                <option>19</option>
+                                <option>20</option>
+                            </select>
+                        </div>
+                        <div class="fieldWrapper form-group">
+                            <select id="id_course" name="course" class="chosen-select form-control input-lg"
+                                    data-placeholder="Select course">
+                                <option value=""></option>
+                                {% for course in courses %}
+                                    <option value="{{ course.id }}">{{ course.code }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="fieldWrapper form-group">
+                            <select id="id_min_cpi" name="min_cpi"
+                                    class="chosen-select form-control input-lg"
+                                    data-placeholder="Select min. CPI">
+                                <option value=""></option>
+                                <option>0</option>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                                <option>6</option>
+                                <option>7</option>
+                                <option>8</option>
+                                <option>9</option>
+                                <option>10</option>
+                            </select>
+                        </div>
+                        <div class="fieldWrapper form-group">
+                            <select id="id_max_semester" name="max_semester"
+                                    class="chosen-select form-control input-lg"
+                                    data-placeholder="Select max. semester">
+                                <option value=""></option>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                                <option>6</option>
+                                <option>7</option>
+                                <option>8</option>
+                                <option>9</option>
+                                <option>10</option>
+                                <option>11</option>
+                                <option>12</option>
+                                <option>13</option>
+                                <option>14</option>
+                                <option>15</option>
+                                <option>16</option>
+                                <option>17</option>
+                                <option>18</option>
+                                <option>19</option>
+                                <option>20</option>
+                            </select>
+                        </div>
+
+                        <div id="course_choices" class="col-xs-12">
+                            <div class="fieldWrapper form-group">
+                                <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <input type="checkbox" id="id_email_course_students" name="email_course_students" value="true">
+                                        </span>
+                                    <input type="text" class="form-control input-md"
+                                           value="Course students" disabled>
+                                </div>
+                                <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <input type="checkbox" id="id_email_course_tas" name="email_course_tas" value="true">
+                                        </span>
+                                    <input type="text" class="form-control input-md"
+                                           value="Course teaching assistants" disabled>
+                                </div>
+                                <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <input type="checkbox" id="id_email_course_professors" name="email_course_professors" value="true">
+                                        </span>
+                                    <input type="text" class="form-control input-md"
+                                           value="Course instructors" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-xs-12">
+                        <div class="fieldWrapper form-group">
+                            <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" id="id_email_self" name="email_self" value="true">
+                                    </span>
+                                <input type="text" class="form-control input-lg"
+                                       value="Include sender's email in the list" disabled>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-xs-6 col-sm-4 col-sm-offset-1">
+                        <button type="submit" name="get_email_list" value="1"
+                                class="btn btn-lg btn-flat btn-primary btn-block">
+                            Get email list
+                        </button>
+                    </div>
+                    <div class="col-xs-6 col-sm-4 col-sm-offset-2">
+                        <button type="button" id="compose_message" class="btn btn-lg btn-flat btn-primary btn-block"
+                                data-toggle="modal" data-target="#compose-modal">
+                            Compose Message
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3">
+
+                    </div>
+                </div>
+
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="modal fade" id="compose-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title"><span class="fa fa-envelope-o"></span> Compose New Message</h4>
+                </div>
+                <div id="modal-body" class="modal-body">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon" style="min-width: 75px; text-align: left;">CC</span>
+                            <input id="cc_to" name="cc_to" type="email" class="form-control" placeholder="Email CC">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon" style="min-width: 75px; text-align: left;">BCC</span>
+                            <input id="bcc_to" name="bcc_to" type="email" class="form-control" placeholder="Email BCC">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon" style="min-width: 75px; text-align: left;">Subject</span>
+                            <input id="subject" name="subject" type="text" class="form-control"
+                                   placeholder="Email subject">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="message" name="message" class="form-control" placeholder="Message"
+                                  style="height: 150px;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <p class="help-block">Attachment limit: 5MB</p>
+
+                        <div class="input-group attachment">
+                                <span class="input-group-btn">
+	                                <button id="attachment-btn" type="button"
+                                            class="file-input-wrapper btn btn-info btn-flat">
+                                        <span class="fa fa-paperclip"></span> Attachment
+                                    </button>
+	                            </span>
+                            <input type="file" id="attachments" name="attachments" multiple>
+                            <input type="text" id="attachments_count" name="files_count" class="form-control"
+                                   placeholder="No files added" disabled>
+                        </div>
+                        <div id="attachments-list"></div>
+                    </div>
+
+                </div>
+                <div class="modal-footer clearfix">
+
+                    <button type="button" id="discard" class="btn btn-flat btn-danger" data-dismiss="modal">
+                        <span class="fa fa-times"></span> Discard
+                    </button>
+
+                    <button type="submit" name="send_message" value="1" class="btn btn-flat btn-primary pull-left">
+                        <span class="fa fa-envelope"></span>
+                        Send Message
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    </form>
+
+    <br>
+
+    {% if display_emails %}
+        <div class="box box-solid box-primary">
+            <div class="box-header">
+                <div class="box-title">
+                    Student Email List
+                </div>
+            </div>
+            <div class="box-body">
+                <h4>Total email count : {{ email_count }}</h4>
+
+                <p><input type="text" id="email_list" value="{{ email_list }}" style="display: block; width: 100%;"></p>
+
+                <p>Press <kbd><kbd>ctrl</kbd><kbd>+</kbd><kbd>c</kbd></kbd> or
+                    <kbd><kbd>cmd</kbd><kbd>+</kbd><kbd>c</kbd></kbd> to copy the email list.</p>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block extrascripts %}
+    <script src="{% static 'js/vendor/chosen/chosen.jquery.js' %}" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        function resetFormElement(element) {
+            element.wrap('<form>').closest('form').get(0).reset();
+            element.unwrap();
+        }
+
+        $(document).ready(function () {
+            $('.chosen-select').chosen({no_results_text: 'No results found!', allow_single_deselect: true});
+
+            var course_choice = $('#course_choices');
+            var course = $('#id_course');
+            if (course.val() == "") {
+                course_choice.hide();
+            }
+            course.on('change', function() {
+                var course_val = $(this).val();
+                if (course_val !== "") {
+                    course_choice.show();
+                } else {
+                    course_choice.hide();
+                }
+            });
+
+            $('#compose_message').click(function (event) {
+                event.preventDefault();
+            });
+
+            $('#attachment-btn').click(function (event) {
+                event.preventDefault();
+            });
+
+            $('#attachments').change(function () {
+                var input = $(this).get(0);
+                var length = input.files.length;
+                var str = "";
+                if (length == 0) {
+                    $('#attachments_count').attr('placeholder', 'No files added');
+                }
+                else {
+                    // str = "<ul class=\"list-group\"><li class=\"list-group-item active\" style=\"color:red;\">List of files</li>";
+                    str = "<ul class=\"list-group\">";
+                    if (length == 1) {
+                        $('#attachments_count').attr('placeholder', '1 file added');
+                    }
+                    else {
+                        $('#attachments_count').attr('placeholder', length.toString() + ' files added');
+                    }
+                    for (var i = 0; i < length; i++) {
+                        var name = input.files.item(i).name;
+                        str += "<li class=\"list-group-item\">" + name + "</li>";
+                    }
+                    str += "</ul>";
+                }
+                $('#attachments-list').html(str);
+            });
+
+
+            $('#discard').click(function () {
+                resetFormElement($('#modal-body'));
+            });
+        });
+
+        {% if display_emails %}
+            $('#email_list').select();
+        {% endif %}
+
+        {% if department %}
+            $('#id_department').val("{{ department }}");
+        {% endif %}
+
+        {% if min_semester %}
+            $('#id_min_semester').val("{{ min_semester }}");
+        {% endif %}
+
+        {% if max_semester %}
+            $('#id_max_semester').val("{{ max_semester }}");
+        {% endif %}
+
+        {% if min_cpi %}
+            $('#id_min_cpi').val("{{ min_cpi }}");
+        {% endif %}
+
+        {% if course %}
+            $('#id_course').val("{{ course }}");
+        {% endif %}
+
+        {% if email_course_students %}
+            $('#id_email_course_students[value=true]').attr("checked", "checked");
+        {% endif %}
+
+        {% if email_course_tas %}
+            $('#id_email_course_tas[value=true]').attr("checked", "checked");
+        {% endif %}
+
+        {% if email_course_professors %}
+            $('#id_email_course_professors[value=true]').attr("checked", "checked");
+        {% endif %}
+
+        {% if email_self %}
+            $('#id_email_self[value=true]').attr("checked", "checked");
+        {% endif %}
+
+    </script>
+{% endblock %}

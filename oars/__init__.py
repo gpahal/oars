@@ -124,7 +124,7 @@ def course_requests_context(request):
 
         if is_request_delete_submitted:
             request_id = request.POST.get('request_id', None)
-            course_credits = get_credits(request.course.credits)
+            course_credits = get_credits(request_id.course.credits)
             if request_id:
                 try:
                     request_obj = Request.objects.get(id=request_id)
@@ -652,6 +652,7 @@ def submitted_request_context(request):
     } 
     return context
 
+
 def submitted_view_request(request, request_id):
     req_user = RequestSubmit.objects.get(id=request_id)
     requests = Request.objects.filter(student=req_user.student,added=True)
@@ -660,6 +661,7 @@ def submitted_view_request(request, request_id):
         'req_user' : req_user,
     }
     return context
+
 
 def mailing_list_context(request):
     departments = Department.objects.all()
