@@ -420,7 +420,7 @@ def students_waiting_context(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     requests = Request.objects.filter(course_id=course_id,
                                       status__in=(settings.WAITING, settings.WAITING_LE)).order_by('id')
-    filter_pref = Filter.objects.filter(filter_type__gte=10).order_by('filter_type')
+    filter_pref = Filter.objects.filter(course=course, filter_type__gte=10).order_by('filter_type')
 
     results = [[] for x in range(12)]
 
