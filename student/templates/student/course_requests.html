@@ -42,6 +42,7 @@
                 <!-- /.box-header -->
 
                 <div class="box-body table-responsive">
+                    <br>
                     <table id="course-listing" class="table table-bordered table-striped">
                         <thead>
                         <tr>
@@ -72,23 +73,59 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <form role="form" name="request_delete_form"
-                                          action="{% url 'student:course_requests' %}" method="post">
-                                        {% csrf_token %}
-                                        <input value="{{ request.id }}" name="request_id" type="hidden">
-                                        <input type="submit" name="request_delete"
-                                               class="btn btn-flat btn-sm btn-danger"
-                                               value="Delete">
-                                    </form>
+                                    {% if request.status == WAITING %}
+                                        <form role="form" name="request_delete_form"
+                                              action="{% url 'student:course_requests' %}" method="post">
+                                            {% csrf_token %}
+                                            <input value="{{ request.id }}" name="request_id" type="hidden">
+                                            <input value="request_delete_helper" name="request_delete_helper" type="hidden">
+                                            <input type="submit" name="request_delete"
+                                                   class="btn btn-flat btn-sm btn-danger"
+                                                   value="Delete">
+                                        </form>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-flat btn-sm btn-danger"
+                                               disabled>Delete</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
+
+                    <br>
+                    <h4><strong>Total credits requested for :</strong> {{ request_credits }}</h4>
+                    <h4><strong>Credits left :</strong> {{ request_credits_left }}</h4>
+
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title"><span class="fa fa-tick"></span> Request delete confirmation</h4>
+                </div>
+                <div id="modal-body" class="modal-body">
+                    Are you sure you want to delete this request?
+                </div>
+                <div class="modal-footer clearfix">
+                    <button type="button" id="close" class="btn btn-flat btn-default" data-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" id="delete" class="btn btn-flat btn-danger" data-dismiss="modal">
+                        Delete
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 
     <div class="row">
         <div class="col-xs-12">
@@ -221,6 +258,13 @@
 
         $(document).ready(function () {
             $('.chosen-select').chosen({no_results_text: 'No results found!', allow_single_deselect: true});
+            $('input[type=submit][name=request_delete]').on('click', function(e) {
+                var form = $(this).closest('form');
+                e.preventDefault();
+                $('#delete-modal').modal({backdrop: 'static', keyboard: false}).one('click', '#delete', function() {
+                    form.trigger('submit');
+                });
+            });
         });
 
     </script>

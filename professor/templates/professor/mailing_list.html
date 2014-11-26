@@ -150,6 +150,15 @@
                                 <option>20</option>
                             </select>
                         </div>
+                        <div class="fieldWrapper form-group">
+                            <select id="id_course" name="course" class="chosen-select form-control input-lg"
+                                    data-placeholder="Select course">
+                                <option value=""></option>
+                                {% for course in courses %}
+                                    <option value="{{ course.id }}">{{ course.code }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
                     </div>
 
@@ -199,6 +208,33 @@
                                 <option>20</option>
                             </select>
                         </div>
+
+                        <div id="course_choices" class="col-xs-12">
+                            <div class="fieldWrapper form-group">
+                                <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <input type="checkbox" id="id_email_course_students" name="email_course_students" value="true">
+                                        </span>
+                                    <input type="text" class="form-control input-md"
+                                           value="Course students" disabled>
+                                </div>
+                                <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <input type="checkbox" id="id_email_course_tas" name="email_course_tas" value="true">
+                                        </span>
+                                    <input type="text" class="form-control input-md"
+                                           value="Course teaching assistants" disabled>
+                                </div>
+                                <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <input type="checkbox" id="id_email_course_professors" name="email_course_professors" value="true">
+                                        </span>
+                                    <input type="text" class="form-control input-md"
+                                           value="Course instructors" disabled>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="col-xs-12">
@@ -212,6 +248,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 <hr>
@@ -343,6 +380,20 @@
         $(document).ready(function () {
             $('.chosen-select').chosen({no_results_text: 'No results found!', allow_single_deselect: true});
 
+            var course_choice = $('#course_choices');
+            var course = $('#id_course');
+            if (course.val() == "") {
+                course_choice.hide();
+            }
+            course.on('change', function() {
+                var course_val = $(this).val();
+                if (course_val !== "") {
+                    course_choice.show();
+                } else {
+                    course_choice.hide();
+                }
+            });
+
             $('#compose_message').click(function (event) {
                 event.preventDefault();
             });
@@ -400,6 +451,22 @@
 
         {% if min_cpi %}
             $('#id_min_cpi').val("{{ min_cpi }}");
+        {% endif %}
+
+        {% if course %}
+            $('#id_course').val("{{ course }}");
+        {% endif %}
+
+        {% if email_course_students %}
+            $('#id_email_course_students[value=true]').attr("checked", "checked");
+        {% endif %}
+
+        {% if email_course_tas %}
+            $('#id_email_course_tas[value=true]').attr("checked", "checked");
+        {% endif %}
+
+        {% if email_course_professors %}
+            $('#id_email_course_professors[value=true]').attr("checked", "checked");
         {% endif %}
 
         {% if email_self %}

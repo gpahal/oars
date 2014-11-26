@@ -169,3 +169,5 @@ REQUEST_STATUS_CHOICES = (
     (REJECTED, 'Rejected'),
     (WAITING_LE, 'Waiting (limit exceeded)'),
 )
+
+REQUEST_CREDIT_LIMIT = 65

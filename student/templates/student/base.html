@@ -15,16 +15,6 @@
             <span class="fa fa-check-square"></span> <span>Course Requests</span>
         </a>
     </li>
-    <li class="{% block plan-class %}{% endblock %}">
-        <a href="{% url 'student:course_plan' %}">
-            <span class="fa fa-check-square"></span> <span>Plan for Courses</span>
-        </a>
-    </li>
-    <li class="{% block submit-class %}{% endblock %}">
-        <a href="{% url 'student:course_submit' %}">
-            <span class="fa fa-check-square"></span> <span>Submit Courses</span>
-        </a>
-    </li>
     <li class="treeview {% block courses-class %}{% endblock %}">
         <a href="#">
             <span class="fa fa-list"></span>

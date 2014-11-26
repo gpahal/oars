@@ -17,6 +17,10 @@ def is_number(s):
         return False
 
 
+def get_credits(val):
+    return (val % 10) + ((val % 100) // 10) + (val // 100)
+
+
 def is_filter_satisfied(request_obj, filter_obj):
     student = request_obj.student
 
@@ -54,10 +58,15 @@ def apply_filter(request_obj, filter_obj):
 def course_requests_context(request):
     course_types = CourseType.objects.all()
     courses = Course.objects.filter(is_offered=True)
+    requests = Request.objects.filter(student=request.user.student)
+    request_credits = 0
+
+    for request_obj in requests:
+        request_credits += get_credits(request_obj.course.credits)
 
     if request.method == 'POST':
         is_new_request_submitted = request.POST.get('course_request', None)
-        is_request_delete_submitted = request.POST.get('request_delete', None)
+        is_request_delete_submitted = request.POST.get('request_delete_helper', None)
     else:
         is_new_request_submitted = False
         is_request_delete_submitted = False
@@ -66,23 +75,34 @@ def course_requests_context(request):
         course_code = request.POST.get('course_code', None)
         if course_code:
             course = Course.objects.get(id=course_code, is_offered=True)
+            course_credits = get_credits(course.credits)
+            if request_credits > settings.REQUEST_CREDIT_LIMIT:
+                raise ValidationError(
+                    _('No more courses can be requested'),
+                    code='invalid',
+                )
+
             flag = True
             for prerequisite in course.prerequisites.all():
-                count_previous = PreviousCourse.objects.filter(student=request.user.student, course=prerequisite).count()
+                count_previous = PreviousCourse.objects.filter(student=request.user.student,
+                                                               course=prerequisite).count()
                 count_current = CurrentCourse.objects.filter(student=request.user.student, course=prerequisite).count()
                 if count_previous + count_current == 0:
                     request_obj = Request(course=course, student=request.user.student, status=settings.REJECTED)
                     request_obj.save()
                     flag = False
                     break
+
             if flag:
                 request_obj = Request(course=course, student=request.user.student, status=settings.WAITING)
-                filters = Filter.objects.filter(course=course, filter_type__in=(settings.ACCEPTED, settings.REJECTED)).order_by('filter_type')
+                filters = Filter.objects.filter(course=course,
+                                                filter_type__in=(settings.ACCEPTED, settings.REJECTED)).order_by('filter_type')
                 for filter_obj in filters:
                     if is_filter_satisfied(request_obj, filter_obj):
                         apply_filter(request_obj, filter_obj)
                         break
                 request_obj.save()
+                request_credits += course_credits
 
         else:
             raise ValidationError(
@@ -92,10 +112,13 @@ def course_requests_context(request):
 
     if is_request_delete_submitted:
         request_id = request.POST.get('request_id', None)
+        course_credits = get_credits(request.course.credits)
         if request_id:
             try:
                 request_obj = Request.objects.get(id=request_id)
-                request_obj.delete()
+                if request_obj.status == settings.WAITING:
+                    request_obj.delete()
+                    request_credits -= course_credits
             except:
                 raise ValidationError(
                     _('Invalid request id'),
@@ -112,6 +135,9 @@ def course_requests_context(request):
         'course_types': course_types,
         'courses': courses,
         'requests': requests,
+        'request_credits': request_credits,
+        'request_credits_left': 0 if (request_credits >= settings.REQUEST_CREDIT_LIMIT)
+                                else settings.REQUEST_CREDIT_LIMIT - request_credits,
         'WAITING': settings.WAITING,
         'ACCEPTED': settings.ACCEPTED,
         'REJECTED': settings.REJECTED,
@@ -119,38 +145,6 @@ def course_requests_context(request):
 
     return context
 
-def course_submit_context(request):
-    
-    is_new_course_added = False
-    is_course_delete_submitted = False
-    if request.method == 'POST':
-        is_new_course_added = request.POST.get('add_course', None)
-        is_course_delete_submitted = request.POST.get('add_delete', None)
-    else:
-        is_new_course_added = False
-
-    if is_new_course_added:
-        request_id = request.POST.get('request_id', None)
-        if request_id:
-            request_obj = Request.objects.get(id=request_id)
-            if request_obj.status == settings.ACCEPTED:
-                request_obj.added = True
-                request_obj.save()
-
-    if is_course_delete_submitted:
-        request_id = request.POST.get('request_id',None)
-        if request_id:
-            request_obj = Request.objects.get(id=request_id)
-            request_obj.added = False
-            request_obj.save()
-
-    requests = Request.objects.filter(student=request.user.student,status=settings.ACCEPTED)
-    added_courses = Request.objects.filter(student=request.user.student,added=True)
-    context = {
-        'requests' : requests,
-        'courses' : added_courses,
-    }
-    return context
 
 def course_plan_context(request):
     course_types = CourseType.objects.all()
@@ -239,7 +233,7 @@ def course_filters_context(request, course_id):
 
     if request.method == 'POST':
         is_new_filter_submitted = request.POST.get('course_filter', None)
-        is_filter_delete_submitted = request.POST.get('filter_delete', None)
+        is_filter_delete_submitted = request.POST.get('filter_delete_helper', None)
     else:
         is_new_filter_submitted = False
         is_filter_delete_submitted = False
@@ -542,14 +536,51 @@ def course_search_context(request):
     return context
 
 
+def course_submit_context(request):
+
+    is_new_course_added = False
+    is_course_delete_submitted = False
+    if request.method == 'POST':
+        is_new_course_added = request.POST.get('add_course', None)
+        is_course_delete_submitted = request.POST.get('add_delete', None)
+
+    if is_new_course_added:
+        request_id = request.POST.get('request_id', None)
+        if request_id:
+            request_obj = Request.objects.get(id=request_id)
+            if request_obj.status == settings.ACCEPTED:
+                request_obj.added = True
+                request_obj.save()
+
+    if is_course_delete_submitted:
+        request_id = request.POST.get('request_id',None)
+        if request_id:
+            request_obj = Request.objects.get(id=request_id)
+            request_obj.added = False
+            request_obj.save()
+
+    requests = Request.objects.filter(student=request.user.student,status=settings.ACCEPTED)
+    added_courses = Request.objects.filter(student=request.user.student,added=True)
+    context = {
+        'requests': requests,
+        'courses': added_courses,
+    }
+    return context
+
+
 def mailing_list_context(request):
     departments = Department.objects.all()
-    emails = []
+    courses = Course.objects.filter(is_current_course=True)
+    emails = set()
     display_emails = False
     department = None
     min_semester = None
     max_semester = None
     min_cpi = None
+    course = None
+    email_course_students = ""
+    email_course_tas = ""
+    email_course_professors = ""
     email_self = "true"
 
     if request.method == 'POST':
@@ -561,6 +592,9 @@ def mailing_list_context(request):
 
     if is_email_list_submitted or is_send_message_submitted:
         students = Student.objects.all()
+        professors = None
+        teaching_assistants = None
+
         department = request.POST.get('department', None)
         if department:
             try:
@@ -584,11 +618,45 @@ def mailing_list_context(request):
         if min_cpi:
             students = students.filter(cpi__gte=min_cpi)
 
-        emails = [student.user.email for student in students]
+        course = request.POST.get('course', None)
+        if course:
+            try:
+                course_obj = Course.objects.get(id=course)
+
+                email_course_students = request.POST.get('email_course_students', None)
+                if email_course_students == "true":
+                    students = students.select_related('currentcourse').filter(currentcourse__in=(course_obj,))
+                else:
+                    students = None
+
+                email_course_tas = request.POST.get('email_course_tas', None)
+                if email_course_tas == "true":
+                    teaching_assistants = course_obj.teaching_assistants.all()
+
+                email_course_professors = request.POST.get('email_course_professors', None)
+                if email_course_professors == "true":
+                    professors = course_obj.professors.all()
+
+            except Course.DoesNotExist:
+                raise ValidationError(
+                    _('Invalid course'),
+                    code='invalid',
+                )
+
+        if students:
+            emails = {student.user.email for student in students}
+
+        if teaching_assistants is not None:
+            for teaching_assistant in teaching_assistants:
+                emails.add(teaching_assistant.user.email)
+
+        if professors is not None:
+            for professor in professors:
+                emails.add(professor.user.email)
 
         email_self = request.POST.get('email_self', None)
         if email_self == 'true':
-            emails.append(request.user.email)
+            emails.add(request.user.email)
 
     if is_send_message_submitted:
         cc_to = request.POST.get('cc_to', None)
@@ -613,7 +681,8 @@ def mailing_list_context(request):
         if not message:
             message = ""
 
-        email_message = EmailMessage('From '+request.user.get_full_name()+': '+subject, message, request.user.email,
+        email_message = EmailMessage('From ' + request.user.get_full_name() + ': ' + subject, message,
+                                     request.user.email,
                                      emails, bcc=bcc_to, cc=cc_to)
 
         for attachment in request.FILES.getlist('attachments'):
@@ -626,6 +695,7 @@ def mailing_list_context(request):
 
     context = {
         'departments': departments,
+        'courses': courses,
         'email_list': ', '.join(emails),
         'email_count': len(emails),
         'display_emails': display_emails,
@@ -633,6 +703,10 @@ def mailing_list_context(request):
         'min_semester': min_semester,
         'max_semester': max_semester,
         'min_cpi': min_cpi,
+        'course': course,
+        'email_course_students': (email_course_students == "true"),
+        'email_course_tas': (email_course_tas == "true"),
+        'email_course_professors': (email_course_professors == "true"),
         'email_self': (email_self == "true"),
     }
 

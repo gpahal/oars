@@ -225,9 +225,11 @@ class Course(models.Model):
                                 validators.RegexValidator(r'^[ \w.@+-]+$', _('Enter a valid course name.'), 'invalid'),
                             ])
     professors = models.ManyToManyField(Professor)
+    teaching_assistants = models.ManyToManyField(Student, null=True, blank=True)
     prerequisites = models.ManyToManyField("self", blank=True)
     schedule = models.CommaSeparatedIntegerField(max_length=70, default='101162,102162,104162')
     is_offered = models.BooleanField(default=False)
+    is_current_course = models.BooleanField(default=False)
     credits = models.PositiveSmallIntegerField(
         validators=[
             validators.MinValueValidator(100),
@@ -254,7 +256,7 @@ class CurrentCourse(models.Model):
         unique_together = (('course', 'student'),)
 
     def __str__(self):
-        return "%s - %s" % (self.student, self.code)
+        return "%s - %s" % (self.student, self.course.code)
 
 
 class PreviousCourse(models.Model):
@@ -278,6 +280,7 @@ class Request(models.Model):
     student = models.ForeignKey(Student)
     status = models.PositiveSmallIntegerField(choices=settings.REQUEST_STATUS_CHOICES, default=settings.WAITING)
     added = models.BooleanField(default=False)
+
     class Meta:
         unique_together = (('course', 'student'),)
 
