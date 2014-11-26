@@ -14,4 +14,5 @@ urlpatterns = patterns('',
                            name='students_rejected'),
                        url(r'^course_listing/$', views.course_listing, name='course_listing'),
                        url(r'^course_search/$', views.course_search, name='course_search'),
+                       url(r'^request_submit/$', views.request_submit, name='request_submit'),
                        )

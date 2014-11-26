@@ -29,6 +29,8 @@
 {% block submit-class %}active{% endblock %}
 
 {% block content %}
+
+    {% if submit_status == None or submit_status == NOT_SUBMITTED %}
     <div class="row">
         <div class="col-xs-12">
             <div class="box box-solid box-primary">
@@ -40,42 +42,52 @@
                     </div>
                 </div>
                 <!-- /.box-header -->
-
-                <div class="box-body table-responsive">
-                    <table id="course-listing" class="table table-bordered table-striped">
-                        <thead>
-                        <tr>
-                            <th class="col-md-1">#</th>
-                            <th class="col-md-2">Course code</th>
-                            <th class="col-md-4">Course title</th>
-                            <th class="col-md-2">Credits</th>
-                            <th class="col-md-1 text-center">Delete</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for request in courses %}
+                <form role="form" name="course_submit_dugc" action="{% url 'student:course_submit' %}" method="post">
+                        {% csrf_token %}
+                    <div class="box-body table-responsive">
+                        <table id="course-listing" class="table table-bordered table-striped">
+                            <thead>
                             <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ request.course.code }}</td>
-                                <td>{{ request.course.name }}</td>
-                                <td>
-                                    <script> document.write(credits_to_string({{ request.course.credits }})); </script>
-                                </td>
-                                <td class="text-center">
-                                    <form role="form" name="request_delete_form"
-                                          action="{% url 'student:course_submit' %}" method="post">
-                                        {% csrf_token %}
-                                        <input value="{{ request.id }}" name="request_id" type="hidden">
-                                        <input type="submit" name="add_delete"
-                                               class="btn btn-flat btn-sm btn-danger"
-                                               value="Delete">
-                                    </form>
-                                </td>
+                                <th class="col-md-1">#</th>
+                                <th class="col-md-2">Course code</th>
+                                <th class="col-md-4">Course title</th>
+                                <th class="col-md-2">Credits</th>
+                                <th class="col-md-1 text-center">Delete</th>
                             </tr>
-                        {% endfor %} 
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                            {% for request in courses %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ request.course.code }}</td>
+                                    <td>{{ request.course.name }}</td>
+                                    <td>
+                                        <script> document.write(credits_to_string({{ request.course.credits }})); </script>
+                                    </td>
+                                    <td class="text-center">
+                                        <form role="form" name="request_delete_form"
+                                              action="{% url 'student:course_submit' %}" method="post">
+                                            {% csrf_token %}
+                                            <input value="{{ request.id }}" name="request_id" type="hidden">
+                                            <input type="submit" name="add_delete"
+                                                   class="btn btn-flat btn-sm btn-danger"
+                                                   value="Delete">
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %} 
+                            </tbody>
+                        </table>
+                    </div>
+                    <br>
+
+                    <div class="row">
+                        <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+                            <input type="submit" name="course_fsubmit"
+                                   class="btn btn-lg btn-flat btn-success btn-block" value="Confirm Submission">
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -152,6 +164,26 @@
             </div>
         </div>
     </div>
+    {% elif submit_status == SUBMITTED %}
+        Submitted.
+        <form role="form" name="withdraw_form" action="{% url 'student:course_submit' %}"
+            method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+                    <input type="submit" name="withdraw_request"
+                           class="btn btn-lg btn-flat btn-danger btn-block" value="Withdraw Form">
+                </div>
+            </div>
+        </form>
+    {% elif submit_status == ACCEPTED %}
+    Accepted
+    {% elif submit_status == REJECTED %}
+    Rejected
+    {% else %}
+        Dont know
+    {% endif %}
+
 {% endblock %}
 
 {% block extrascripts %}

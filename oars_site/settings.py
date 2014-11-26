@@ -171,3 +171,15 @@ REQUEST_STATUS_CHOICES = (
 )
 
 REQUEST_CREDIT_LIMIT = 65
+
+NOT_SUBMITTED = 0
+SUBMITTED = 1
+SUBMIT_ACCEPTED = 2
+SUBMIT_REJECTED = 4
+
+SUBMIT_STATUS_CHOICES = (
+    (NOT_SUBMITTED, 'Not submitted'),
+    (SUBMITTED, 'Submitted'),
+    (SUBMIT_ACCEPTED, 'Submit & accepted'),
+    (SUBMIT_REJECTED, 'Submit & rejected'),
+)

@@ -287,6 +287,12 @@ class Request(models.Model):
     def __str__(self):
         return "%s - %s" % (self.student, self.course)
 
+class RequestSubmit(models.Model):
+    student = models.ForeignKey(Student)
+    status = models.PositiveSmallIntegerField(choices=settings.SUBMIT_STATUS_CHOICES, default=settings.NOT_SUBMITTED)
+
+    def __str__(self):
+        return "%s - %s" % (self.student, self.status)
 
 class CoursePlan(models.Model):
     course = models.ForeignKey(Course)

@@ -2,7 +2,7 @@
 
 {% load staticfiles %}
 
-{% block title %}Course Request{% endblock %}
+{% block title %}Course Plan{% endblock %}
 
 {% block extrastyle %}
     <link type="text/css" rel="stylesheet" href="{% static 'css/vendor/chosen/chosen.css' %}">
@@ -48,13 +48,13 @@
     </script>
 {% endblock %}
 
-{% block heading %}Course Request{% endblock %}
+{% block heading %}Course Plan{% endblock %}
 
 {% block relative-address %}
-    <li class="active">Course Request</li>
+    <li class="active">Course Plan</li>
 {% endblock %}
 
-{% block request-class %}active{% endblock %}
+{% block plan-class %}active{% endblock %}
 
 {% block content %}
     <div class="row">
@@ -68,7 +68,7 @@
     <br>
     <!-- modal -->
     <div class="modal fade" id="timetable-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg" style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -77,15 +77,6 @@
                 <div id="modal-body" class="modal-body">
                 </div>
                 <div class="modal-footer clearfix">
-
-                    <!--  <button type="button" id="discard" class="btn btn-flat btn-danger" data-dismiss="modal">
-                         <i class="fa fa-times"></i> Discard
-                     </button>
-
-                     <button type="submit" name="send_message" value="1" class="btn btn-flat btn-primary pull-left">
-                         <i class="fa fa-envelope"></i>
-                         Send Message
-                     </button> -->
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -335,7 +326,7 @@
         var day_map = {'0': 'Monday', '1': 'Tuesday', '2': 'Wednesday', '3': 'Thrusday', '4': 'Friday'};
         var schedtype_map = {'1': 'L', '2': 'T', '3': 'P'};
 
-        var time_html = "<div class='col-xs-12'><table class='' align='center' >" +
+        var time_html = "<div class='col-xs-12'><div class='table-reponsive'><table class='table' align='center' >" +
                 "<tr>" +
                 "<th>Time</th>" +
                 "<th>8:00-8:30</th>" +
@@ -392,7 +383,7 @@
             }
             time_html += "</tr>";
         }
-        time_html += "</table></div>";
+        time_html += "</table></div></div>";
         document.getElementById("modal-body").innerHTML = time_html;
 
     </script>

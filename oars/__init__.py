@@ -1,5 +1,5 @@
 from oars.models import (Department, Student, Professor, CourseType, Course,
-                         CurrentCourse, PreviousCourse, Request, Filter, CoursePlan)
+                         CurrentCourse, PreviousCourse, Request, Filter, CoursePlan, RequestSubmit)
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
@@ -208,7 +208,7 @@ def courses_offered_context(request):
 
 
 def courses_offered_dept_context(request):
-    courses = Course.objects.select_related('department').filter(department=request.user.professor.department,
+    courses = Course.objects.select_related('department').filter(department=request.user.dugc.department,
                                                                  is_offered=True)
     context = {
         'courses': courses,
@@ -538,35 +538,102 @@ def course_search_context(request):
 
 def course_submit_context(request):
 
-    is_new_course_added = False
-    is_course_delete_submitted = False
-    if request.method == 'POST':
-        is_new_course_added = request.POST.get('add_course', None)
-        is_course_delete_submitted = request.POST.get('add_delete', None)
+    flag = True
+    status = None
+    try:
+        request_submit = RequestSubmit.objects.get(student=request.user.student)
+        status = request_submit.status
+        if status == settings.SUBMITTED:
+            flag = False
+            is_withdraw = False
+            if request.method == 'POST':
+                is_withdraw = request.POST.get('withdraw_request', None)
+            if is_withdraw:
+                request_submit = RequestSubmit.objects.get(student=request.user.student)
+                request_submit.status = settings.NOT_SUBMITTED
+                status = None
+                flag = True
+                request_submit.save()
+        elif status > settings.SUBMITTED:
+            flag = False
+    except RequestSubmit.DoesNotExist:
+        flag = True
 
-    if is_new_course_added:
-        request_id = request.POST.get('request_id', None)
-        if request_id:
-            request_obj = Request.objects.get(id=request_id)
-            if request_obj.status == settings.ACCEPTED:
-                request_obj.added = True
+    if flag:
+        is_new_course_added = False
+        is_course_delete_submitted = False
+        is_submitted = False
+        if request.method == 'POST':
+            is_new_course_added = request.POST.get('add_course', None)
+            is_course_delete_submitted = request.POST.get('add_delete', None)
+            is_submitted = request.POST.get('course_fsubmit', None)
+
+        if is_new_course_added:
+            request_id = request.POST.get('request_id', None)
+            if request_id:
+                request_obj = Request.objects.get(id=request_id)
+                if request_obj.status == settings.ACCEPTED:
+                    request_obj.added = True
+                    request_obj.save()
+
+        if is_course_delete_submitted:
+            request_id = request.POST.get('request_id',None)
+            if request_id:
+                request_obj = Request.objects.get(id=request_id)
+                request_obj.added = False
                 request_obj.save()
 
-    if is_course_delete_submitted:
-        request_id = request.POST.get('request_id',None)
-        if request_id:
-            request_obj = Request.objects.get(id=request_id)
-            request_obj.added = False
-            request_obj.save()
+        if is_submitted:
+            requested_course_count = Request.objects.filter(student=request.user.student,added=True).count() 
+            if requested_course_count > 0 :
+                try:
+                    request_submit = RequestSubmit.objects.get(student=request.user.student)
+                    request_submit.status = settings.SUBMITTED
+                    request_submit.save()
+                except RequestSubmit.DoesNotExist:
+                    request_submit = RequestSubmit(student=request.user.student,status=settings.SUBMITTED)
+                    request_submit.save()
+                status = settings.SUBMITTED
 
     requests = Request.objects.filter(student=request.user.student,status=settings.ACCEPTED)
     added_courses = Request.objects.filter(student=request.user.student,added=True)
     context = {
         'requests': requests,
         'courses': added_courses,
+        'submit_status': status,
+        'SUBMITTED': settings.SUBMITTED,
+        'ACCEPTED': settings.SUBMIT_ACCEPTED,
+        'REJECTED': settings.SUBMIT_REJECTED,
+        'NOT_SUBMITTED': settings.NOT_SUBMITTED,
     }
     return context
 
+def submitted_request_context(request):
+    is_student_accepeted = False
+    is_student_rejected = False
+    if request.method == 'POST':
+        is_student_accepeted = request.POST.get('request_accept', None)
+        is_student_rejected = request.POST.get('request_reject', None)
+
+    if is_student_accepeted:
+        request_id = request.POST.get('request_id', None)
+        if request_id:
+            request_obj = RequestSubmit.objects.get(id=request_id)
+            request_obj.status = settings.SUBMIT_ACCEPTED
+            request_obj.save()
+
+    if is_student_rejected:
+        request_id = request.POST.get('request_id', None)
+        if request_id:
+            request_obj = RequestSubmit.objects.get(id=request_id)
+            request_obj.status = settings.SUBMIT_REJECTED
+            request_obj.save() 
+
+    requests = RequestSubmit.objects.filter(status=settings.SUBMITTED)
+    context = {
+        'requests' : requests,
+    } 
+    return context
 
 def mailing_list_context(request):
     departments = Department.objects.all()
