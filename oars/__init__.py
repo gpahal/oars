@@ -138,7 +138,11 @@ def course_submit_context(request):
                 request_obj.save()
 
     if is_course_delete_submitted:
-        print("Delete")
+        request_id = request.POST.get('request_id',None)
+        if request_id:
+            request_obj = Request.objects.get(id=request_id)
+            request_obj.added = False
+            request_obj.save()
 
     requests = Request.objects.filter(student=request.user.student,status=settings.ACCEPTED)
     added_courses = Request.objects.filter(student=request.user.student,added=True)
