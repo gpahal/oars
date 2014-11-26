@@ -257,15 +257,18 @@
         });
 
         
-        var schedule = new Array(5);
+       var schedule = new Array(5);
         var clash_count = new Array(5);
+        var lab_clash_lab = new Array(5);
         var lab_course_clash = {};
         for (var i = 0; i < 5; i++) {
             schedule[i] = new Array(22);
             clash_count[i] = new Array(22);
+            lab_clash_lab[i] = new Array(22);
             for (var j = 0; j < 22; j++) {
                 schedule[i][j] = [];
                 clash_count[i][j] = 0;
+                lab_clash_lab[i][j] = 0;
             }
         }
 
@@ -291,6 +294,9 @@
                         if (type == 1 || type == 2) {
                             clash_count[0][time + j] += 1;
                         }
+                        else if(type == 3){
+                            lab_clash_lab[0][time + j] += 1;
+                        }
                     }
                 }
                 day = day / 2;
@@ -299,6 +305,9 @@
                         schedule[1][time + j].push({code: '{{request.course.code}}', type: type });
                         if (type == 1 || type == 2) {
                             clash_count[1][time + j] += 1;
+                        }
+                        else if(type == 3){
+                            lab_clash_lab[1][time + j] += 1;
                         }
                     }
                 }
@@ -309,6 +318,9 @@
                         if (type == 1 || type == 2) {
                             clash_count[2][time + j] += 1;
                         }
+                        else if(type == 3){
+                            lab_clash_lab[2][time + j] += 1;
+                        }
                     }
                 }
                 day = day / 2;
@@ -318,6 +330,9 @@
                         if (type == 1 || type == 2) {
                             clash_count[3][time + j] += 1;
                         }
+                        else if(type == 3){
+                            lab_clash_lab[3][time + j] += 1;
+                        }
                     }
                 }
                 day = day / 2;
@@ -326,6 +341,9 @@
                         schedule[4][time + j].push({code: '{{request.course.code}}', type: type });
                         if (type == 1 || type == 2) {
                             clash_count[4][time + j] += 1;
+                        }
+                        else if(type == 3){
+                            lab_clash_lab[4][time + j] += 1;
                         }
                     }
                 }
@@ -349,6 +367,9 @@
                 if(day==8)  l = 3;
                 if(day==16) l = 4;
                 for (var j = 0; j < duration; j++) {
+                    if(lab_clash_lab[l][time+j]>1 || clash_count[l][time+j]>0 ){
+                        document.getElementById('lab_clash').innerHTML = "Potential Lab Clash";
+                    }
                     if(clash_count[l][time+j]>0){
                         num_clashes++;
                         break;
@@ -356,7 +377,6 @@
                 }
             }
             if(num_clashes == lab_course_clash[course].length){
-                // console.log("Lab not possible");
                 document.getElementById('lab_clash').innerHTML = "Clash";
             }
         }

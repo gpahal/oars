@@ -87,8 +87,8 @@
                         {% for request in requests %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
-                                <td><a href="{% url 'dugc:request' request_id=request.id %}">{{ request.student.roll_no }}</a></td>
-                                <td><a href="{% url 'dugc:request' request_id=request.id %}">{{ request.student.user.get_full_name }}</a></td>
+                                <td><a class="clickable" href="{% url 'dugc:request' request_id=request.id %}" >{{ request.student.roll_no }}</a></td>
+                                <td><a class="clickable" href="{% url 'dugc:request' request_id=request.id %}" >{{ request.student.user.get_full_name }}</a></td>
                                 <td>{{ request.student.semester }}</td>
                                 <form role="form" name="request_delete_form"
                                           action="{% url 'dugc:request_submit' %}" method="post">
@@ -135,6 +135,10 @@
                 h = window.screen.availHeight * percent / 100;
                 t = window.screen.availHeight * (100-percent) / 200;
             }
+            $(".clickable").on('click',function(e) {
+                e.preventDefault();
+                window.open($(this).attr("href"),"",'left='+l+',top='+t+',width='+w+',height='+h+'resizable=yes');
+            });
         });
     </script>
 {% endblock %}
