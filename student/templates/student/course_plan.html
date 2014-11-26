@@ -120,7 +120,7 @@
                                     </td>
                                     <td class="text-center">
                                         <form role="form" name="request_delete_form"
-                                              action="{% url 'student:course_requests' %}" method="post">
+                                              action="{% url 'student:course_plan' %}" method="post">
                                             {% csrf_token %}
                                             <input value="{{ request.id }}" name="request_id" type="hidden">
                                             <input type="submit" name="request_delete"
