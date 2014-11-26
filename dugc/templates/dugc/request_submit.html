@@ -85,7 +85,7 @@
                         </thead>
                         <tbody id="student-listing-body">
                         {% for request in requests %}
-                            <tr>
+                            <tr class="clickable" href="{% url 'dugc:request' request_id=request.id %}">
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ request.student.roll_no }}</td>
                                 <td>{{ request.student.user.get_full_name }}</td>
@@ -126,6 +126,17 @@
                     [20, 50, 100, -1],
                     [20, 50, 100, "All"]
                 ]
+            });
+            var percent = 84;
+            var w = 630, h = 440; // default sizes
+            if (window.screen) {
+                w = window.screen.availWidth * percent / 100;
+                l = window.screen.availWidth * (100-percent) / 200;
+                h = window.screen.availHeight * percent / 100;
+                t = window.screen.availHeight * (100-percent) / 200;
+            }
+            $(".clickable").click(function() {
+                window.open($(this).attr("href"),"",'left='+l+',top='+t+',width='+w+',height='+h+'resizable=yes');
             });
         });
     </script>

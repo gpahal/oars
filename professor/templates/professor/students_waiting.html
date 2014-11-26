@@ -201,8 +201,9 @@
                             <tr>
                                 <th class="col-md-1">#</th>
                                 <th class="col-md-1">Preference</th>
+                                <th class="col-md-1">TimeStamp</th>
                                 <th class="col-md-2">Roll No.</th>
-                                <th class="col-md-3">Name</th>
+                                <th class="col-md-2">Name</th>
                                 <th class="col-md-1">Department</th>
                                 <th class="col-md-1">CPI</th>
                                 <th class="col-md-1">Semester</th>
@@ -224,6 +225,7 @@
                                                 {{ forloop.parentloop.counter|add:"-1" }}
                                             {% endif %}
                                         </td>
+                                        <td>{{ request.id }}</td>
                                         <td>{{ request.student.roll_no }}</td>
                                         <td>{{ request.student.user.get_full_name }}</td>
                                         <td>{{ request.student.department.code }}</td>

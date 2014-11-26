@@ -6,6 +6,98 @@
 
 {% block extrastyle %}
     <link type="text/css" rel="stylesheet" href="{% static 'css/vendor/chosen/chosen.css' %}">
+    <style>
+        .bs-callout {
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #eee;
+            border-left-width: 5px;
+            border-radius: 3px;
+            background-color: #e9e9e9;
+        }
+
+        .bs-callout h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        .bs-callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .bs-callout code {
+            border-radius: 3px;
+        }
+
+        .bs-callout + .bs-callout {
+            margin-top: -5px;
+        }
+
+        .bs-callout-default {
+            border-left-color: #777;
+        }
+
+        .bs-callout-default h3 {
+            color: #777;
+        }
+
+        .bs-callout-primary {
+            border-left-color: #428bca;
+        }
+
+        .bs-callout-primary h3 {
+            color: #428bca;
+        }
+
+        .bs-callout-success {
+            border-left-color: #5cb85c;
+        }
+
+        .bs-callout-success h3 {
+            color: #5cb85c;
+        }
+
+        .bs-callout-danger {
+            border-left-color: #d9534f;
+        }
+
+        .bs-callout-danger h3 {
+            color: #d9534f;
+        }
+
+        .bs-callout-warning {
+            border-left-color: #f0ad4e;
+        }
+
+        .bs-callout-warning h3 {
+            color: #f0ad4e;
+        }
+
+        .bs-callout-info {
+            border-left-color: #5bc0de;
+        }
+
+        .bs-callout-info h3 {
+            color: #5bc0de;
+        }
+
+        .message {
+            font-size: 1.3em;
+        }
+
+        hr {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            border-width: 2px 0;
+            border-radius: 2px;
+            border-color: #c0c0c0;
+        }
+
+        .btn {
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+    </style>
 {% endblock %}
 
 {% block extrahead %}
@@ -29,6 +121,7 @@
 {% block request-class %}active{% endblock %}
 
 {% block content %}
+    {% if submit_status == None or submit_status == NOT_SUBMITTED %}
     <div class="row">
         <div class="col-xs-12">
             <div class="box box-solid box-primary">
@@ -209,6 +302,51 @@
             </div>
         </div>
     </div>
+    {% elif submit_status == SUBMITTED %}
+        <div class="col-xs-12 col-md-8 col-md-offset-2">
+            <div class="bs-callout bs-callout-success">
+                <h3>
+                    <strong>Submitted</strong>
+                </h3>
+
+                <hr>
+
+                <div class="message">
+                    Your form has already been submitted. In order to withdraw the form, <a href="{% url 'student:course_submit' %}">click here</a>
+                </div>
+            </div>
+        </div>
+        
+    {% elif submit_status == SUBMIT_ACCEPTED %}
+        <div class="col-xs-12 col-md-8 col-md-offset-2">
+            <div class="bs-callout bs-callout-success">
+                <h3>
+                    <strong>Submission Accepted</strong>
+                </h3>
+
+                <hr>
+
+                <div class="message">
+                    Your form has already been accepted.
+                </div>
+            </div>
+        </div>
+    {% elif submit_status == SUBMIT_REJECTED %}
+        <div class="col-xs-12 col-md-8 col-md-offset-2">
+            <div class="bs-callout bs-callout-danger">
+                <h3>
+                    <strong>Submission Rejected</strong>
+                </h3>
+
+                <hr>
+
+                <div class="message">
+                    Your form has been rejected.
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
 {% endblock %}
 
 {% block extrascripts %}

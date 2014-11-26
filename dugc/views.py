@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 
 from oars import (courses_offered_dept_context, course_context,
                   students_waiting_context, students_accepted_context, students_rejected_context,
-                  course_filters_limited_context, course_listing_context, course_search_context, submitted_request_context)
+                  course_filters_limited_context, course_listing_context, course_search_context, submitted_request_context,submitted_view_request)
 
 
 def context_wrapper(request, context):
@@ -73,5 +73,10 @@ def course_search(request, template_name='dugc/course_search.html'):
 
 def request_submit(request, template_name='dugc/request_submit.html'):
     context = context_wrapper(request, submitted_request_context(request))
+
+    return TemplateResponse(request, template_name, context=context)
+
+def request(request, request_id=None, template_name='dugc/request_credentials.html'):
+    context = context_wrapper(request, submitted_view_request(request, request_id))
 
     return TemplateResponse(request, template_name, context=context)

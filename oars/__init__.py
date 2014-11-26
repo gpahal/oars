@@ -56,79 +56,91 @@ def apply_filter(request_obj, filter_obj):
 
 
 def course_requests_context(request):
+    flag = True
+    status = None
+    try:
+        request_submit = RequestSubmit.objects.get(student=request.user.student)
+        status = request_submit.status
+        if status >= settings.SUBMITTED:
+            flag = False
+    except RequestSubmit.DoesNotExist:
+        flag = True
+
+
     course_types = CourseType.objects.all()
     courses = Course.objects.filter(is_offered=True)
     requests = Request.objects.filter(student=request.user.student)
     request_credits = 0
 
-    for request_obj in requests:
-        request_credits += get_credits(request_obj.course.credits)
+    if flag:
+        for request_obj in requests:
+            request_credits += get_credits(request_obj.course.credits)
 
-    if request.method == 'POST':
-        is_new_request_submitted = request.POST.get('course_request', None)
-        is_request_delete_submitted = request.POST.get('request_delete_helper', None)
-    else:
-        is_new_request_submitted = False
-        is_request_delete_submitted = False
+        if request.method == 'POST':
+            is_new_request_submitted = request.POST.get('course_request', None)
+            is_request_delete_submitted = request.POST.get('request_delete_helper', None)
+        else:
+            is_new_request_submitted = False
+            is_request_delete_submitted = False
 
-    if is_new_request_submitted:
-        course_code = request.POST.get('course_code', None)
-        if course_code:
-            course = Course.objects.get(id=course_code, is_offered=True)
-            course_credits = get_credits(course.credits)
-            if request_credits > settings.REQUEST_CREDIT_LIMIT:
+        if is_new_request_submitted:
+            course_code = request.POST.get('course_code', None)
+            if course_code:
+                course = Course.objects.get(id=course_code, is_offered=True)
+                course_credits = get_credits(course.credits)
+                if request_credits > settings.REQUEST_CREDIT_LIMIT:
+                    raise ValidationError(
+                        _('No more courses can be requested'),
+                        code='invalid',
+                    )
+
+                flag = True
+                for prerequisite in course.prerequisites.all():
+                    count_previous = PreviousCourse.objects.filter(student=request.user.student,
+                                                                   course=prerequisite).count()
+                    count_current = CurrentCourse.objects.filter(student=request.user.student, course=prerequisite).count()
+                    if count_previous + count_current == 0:
+                        request_obj = Request(course=course, student=request.user.student, status=settings.REJECTED)
+                        request_obj.save()
+                        flag = False
+                        break
+
+                if flag:
+                    request_obj = Request(course=course, student=request.user.student, status=settings.WAITING)
+                    filters = Filter.objects.filter(course=course,
+                                                    filter_type__in=(settings.ACCEPTED, settings.REJECTED)).order_by('filter_type')
+                    for filter_obj in filters:
+                        if is_filter_satisfied(request_obj, filter_obj):
+                            apply_filter(request_obj, filter_obj)
+                            break
+                    request_obj.save()
+                    request_credits += course_credits
+
+            else:
                 raise ValidationError(
-                    _('No more courses can be requested'),
+                    _('Invalid course code'),
                     code='invalid',
                 )
 
-            flag = True
-            for prerequisite in course.prerequisites.all():
-                count_previous = PreviousCourse.objects.filter(student=request.user.student,
-                                                               course=prerequisite).count()
-                count_current = CurrentCourse.objects.filter(student=request.user.student, course=prerequisite).count()
-                if count_previous + count_current == 0:
-                    request_obj = Request(course=course, student=request.user.student, status=settings.REJECTED)
-                    request_obj.save()
-                    flag = False
-                    break
-
-            if flag:
-                request_obj = Request(course=course, student=request.user.student, status=settings.WAITING)
-                filters = Filter.objects.filter(course=course,
-                                                filter_type__in=(settings.ACCEPTED, settings.REJECTED)).order_by('filter_type')
-                for filter_obj in filters:
-                    if is_filter_satisfied(request_obj, filter_obj):
-                        apply_filter(request_obj, filter_obj)
-                        break
-                request_obj.save()
-                request_credits += course_credits
-
-        else:
-            raise ValidationError(
-                _('Invalid course code'),
-                code='invalid',
-            )
-
-    if is_request_delete_submitted:
-        request_id = request.POST.get('request_id', None)
-        course_credits = get_credits(request.course.credits)
-        if request_id:
-            try:
-                request_obj = Request.objects.get(id=request_id)
-                if request_obj.status == settings.WAITING:
-                    request_obj.delete()
-                    request_credits -= course_credits
-            except:
+        if is_request_delete_submitted:
+            request_id = request.POST.get('request_id', None)
+            course_credits = get_credits(request.course.credits)
+            if request_id:
+                try:
+                    request_obj = Request.objects.get(id=request_id)
+                    if request_obj.status == settings.WAITING:
+                        request_obj.delete()
+                        request_credits -= course_credits
+                except:
+                    raise ValidationError(
+                        _('Invalid request id'),
+                        code='invalid',
+                    )
+            else:
                 raise ValidationError(
                     _('Invalid request id'),
                     code='invalid',
                 )
-        else:
-            raise ValidationError(
-                _('Invalid request id'),
-                code='invalid',
-            )
 
     requests = Request.objects.filter(student=request.user.student)
     context = {
@@ -141,6 +153,11 @@ def course_requests_context(request):
         'WAITING': settings.WAITING,
         'ACCEPTED': settings.ACCEPTED,
         'REJECTED': settings.REJECTED,
+        'submit_status': status,
+        'SUBMITTED': settings.SUBMITTED,
+        'SUBMIT_ACCEPTED': settings.SUBMIT_ACCEPTED,
+        'SUBMIT_REJECTED': settings.SUBMIT_REJECTED,
+        'NOT_SUBMITTED': settings.NOT_SUBMITTED,
     }
 
     return context
@@ -633,6 +650,15 @@ def submitted_request_context(request):
     context = {
         'requests' : requests,
     } 
+    return context
+
+def submitted_view_request(request, request_id):
+    req_user = RequestSubmit.objects.get(id=request_id)
+    requests = Request.objects.filter(student=req_user.student,added=True)
+    context = {
+        'requests' : requests,
+        'req_user' : req_user,
+    }
     return context
 
 def mailing_list_context(request):
