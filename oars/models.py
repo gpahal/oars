@@ -136,6 +136,10 @@ class User(AbstractBaseUser):
         """
         return self.is_admin
 
+    @staticmethod
+    def autocomplete_search_fields():
+        return ('id__iexact', 'username__icontains', 'full_name__icontains')
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User)
@@ -149,6 +153,10 @@ class Profile(models.Model):
 
     def get_full_name(self):
         return self.user.get_full_name()
+
+    @staticmethod
+    def autocomplete_search_fields():
+        return ('id__iexact', 'code__icontains', 'name__icontains')
 
 
 class Department(models.Model):
@@ -168,6 +176,9 @@ class Department(models.Model):
     def __str__(self):
         return self.code
 
+    @staticmethod
+    def autocomplete_search_fields():
+        return ('id__iexact', 'code__icontains', 'name__icontains')
 
 class Student(Profile):
     user_type = settings.USER_STUDENT
@@ -208,6 +219,10 @@ class CourseType(models.Model):
     def __str__(self):
         return self.code
 
+    @staticmethod
+    def autocomplete_search_fields():
+        return ('id__iexact', 'code__icontains')
+
 
 class Course(models.Model):
     department = models.ForeignKey(Department)
@@ -246,6 +261,10 @@ class Course(models.Model):
     def limit_exceeded(self):
         student_count = Request.objects.filter(course=self, status=settings.ACCEPTED)
         return student_count >= self.limit
+
+    @staticmethod
+    def autocomplete_search_fields():
+        return ('id__iexact', 'code__icontains', 'name__icontains')
 
 
 class CurrentCourse(models.Model):
@@ -287,12 +306,14 @@ class Request(models.Model):
     def __str__(self):
         return "%s - %s" % (self.student, self.course)
 
+
 class RequestSubmit(models.Model):
     student = models.ForeignKey(Student)
     status = models.PositiveSmallIntegerField(choices=settings.SUBMIT_STATUS_CHOICES, default=settings.NOT_SUBMITTED)
 
     def __str__(self):
         return "%s - %s" % (self.student, self.status)
+
 
 class CoursePlan(models.Model):
     course = models.ForeignKey(Course)
