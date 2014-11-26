@@ -124,11 +124,11 @@ def course_requests_context(request):
 
         if is_request_delete_submitted:
             request_id = request.POST.get('request_id', None)
-            course_credits = get_credits(request_id.course.credits)
             if request_id:
                 try:
                     request_obj = Request.objects.get(id=request_id)
                     if request_obj.status == settings.WAITING:
+                        course_credits = get_credits(request_obj.course.credits)
                         request_obj.delete()
                         request_credits -= course_credits
                 except:
