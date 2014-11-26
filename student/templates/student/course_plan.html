@@ -120,7 +120,7 @@
                                     </td>
                                     <td class="text-center">
                                         <form role="form" name="request_delete_form"
-                                              action="{% url 'student:course_requests' %}" method="post">
+                                              action="{% url 'student:course_plan' %}" method="post">
                                             {% csrf_token %}
                                             <input value="{{ request.id }}" name="request_id" type="hidden">
                                             <input type="submit" name="request_delete"
@@ -329,7 +329,6 @@
                     }
                 }
             }
-            // console.log(schedule);
         {% endfor %}
 
         //detect lab_course_clash
@@ -356,7 +355,6 @@
                 }
             }
             if(num_clashes == lab_course_clash[course].length){
-                // console.log("Lab not possible");
                 document.getElementById('lab_clash').innerHTML = "Lab clash";
             }
         }

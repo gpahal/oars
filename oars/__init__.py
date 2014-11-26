@@ -121,8 +121,11 @@ def course_requests_context(request):
 
 def course_submit_context(request):
     
+    is_new_course_added = False
+    is_course_delete_submitted = False
     if request.method == 'POST':
-        is_new_course_added = request.POST.get('course_submit', None)
+        is_new_course_added = request.POST.get('add_course', None)
+        is_course_delete_submitted = request.POST.get('add_delete', None)
     else:
         is_new_course_added = False
 
@@ -133,6 +136,9 @@ def course_submit_context(request):
             if request_obj.status == settings.ACCEPTED:
                 request_obj.added = True
                 request_obj.save()
+
+    if is_course_delete_submitted:
+        print("Delete")
 
     requests = Request.objects.filter(student=request.user.student,status=settings.ACCEPTED)
     added_courses = Request.objects.filter(student=request.user.student,added=True)
