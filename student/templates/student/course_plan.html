@@ -7,24 +7,24 @@
 {% block extrastyle %}
     <link type="text/css" rel="stylesheet" href="{% static 'css/vendor/chosen/chosen.css' %}">
     <style type="text/css">
-        th, td {
+        .tt, .ttd {
             margin: 0;
             text-align: center;
             border-collapse: collapse;
             outline: 1px solid #e3e3e3;
         }
 
-        td {
+        .ttd {
             padding: 5px 10px;
         }
 
-        th {
+        .tt {
             background: #666;
             color: white;
             padding: 5px 10px;
         }
 
-        td:hover {
+        .ttd:hover {
             cursor: pointer;
             background: #666;
             color: white;
@@ -328,27 +328,27 @@
 
         var time_html = "<div class='col-xs-12'><div class='table-reponsive'><table class='table' align='center' >" +
                 "<tr>" +
-                "<th>Time</th>" +
-                "<th>8:00-8:30</th>" +
-                "<th>8:30-9:00</th>" +
-                "<th>9:00-9:30</th>" +
-                "<th>9:30-10:00</th>" +
-                "<th>10:00-10:30</th>" +
-                "<th>10:30-11:00</th>" +
-                "<th>11:00-11:30</th>" +
-                "<th>11:30-12:00</th>" +
-                "<th>12:00-12:30</th>" +
-                "<th>12:30-13:00</th>" +
-                "<th>13:00-13:30</th>" +
-                "<th>13:30-14:00</th>" +
+                "<th class='tt'>Time</th>" +
+                "<th class='tt'>8:00-8:30</th>" +
+                "<th class='tt'>8:30-9:00</th>" +
+                "<th class='tt'>9:00-9:30</th>" +
+                "<th class='tt'>9:30-10:00</th>" +
+                "<th class='tt'>10:00-10:30</th>" +
+                "<th class='tt'>10:30-11:00</th>" +
+                "<th class='tt'>11:00-11:30</th>" +
+                "<th class='tt'>11:30-12:00</th>" +
+                "<th class='tt'>12:00-12:30</th>" +
+                "<th class='tt'>12:30-13:00</th>" +
+                "<th class='tt'>13:00-13:30</th>" +
+                "<th class='tt'>13:30-14:00</th>" +
                 "</tr>";
         for (var k = 0; k <= 4; k++) {
-            time_html += "<tr><th>" + day_map[k] + "</th>";
+            time_html += "<tr><th class='tt'>" + day_map[k] + "</th>";
             for (var i = 0; i < 12; i++) {
                 if (clash_count[k][i] > 1) {
-                    time_html += "<td class='clash'>";
+                    time_html += "<td class='ttd clash'>";
                 } else {
-                    time_html += "<td>";
+                    time_html += "<td class='ttd'>";
                 }
                 for (var j = 0; j < schedule[k][i].length; j++) {
                     time_html += schedule[k][i][j]['code'] + ' (' + schedtype_map[schedule[k][i][j]['type']] + ')<br>';
@@ -360,22 +360,22 @@
         time_html += "</table>";
         time_html += "<br><table class='' align='center' >" +
                 "<tr>" +
-                "<th>Time</th>" +
-                "<th>14:00-14:30</th>" +
-                "<th>14:30-15:00</th>" +
-                "<th>15:00-15:30</th>" +
-                "<th>15:30-16:00</th>" +
-                "<th>16:00-16:30</th>" +
-                "<th>16:30-17:00</th>" +
-                "<th>17:00-17:30</th>" +
-                "<th>17:30-18:00</th>" +
-                "<th>18:00-18:30</th>" +
-                "<th>18:30-19:00</th>" +
+                "<th class='tt'>Time</th>" +
+                "<th class='tt'>14:00-14:30</th>" +
+                "<th class='tt'>14:30-15:00</th>" +
+                "<th class='tt'>15:00-15:30</th>" +
+                "<th class='tt'>15:30-16:00</th>" +
+                "<th class='tt'>16:00-16:30</th>" +
+                "<th class='tt'>16:30-17:00</th>" +
+                "<th class='tt'>17:00-17:30</th>" +
+                "<th class='tt'>17:30-18:00</th>" +
+                "<th class='tt'>18:00-18:30</th>" +
+                "<th class='tt'>18:30-19:00</th>" +
                 "</tr>";
         for (var k = 0; k <= 4; k++) {
-            time_html += "<tr><th>" + day_map[k] + "</th>";
+            time_html += "<tr><th class='tt'>" + day_map[k] + "</th>";
             for (var i = 12; i < 22; i++) {
-                time_html += "<td>";
+                time_html += "<td class='ttd'>";
                 for (var j = 0; j < schedule[k][i].length; j++) {
                     time_html += schedule[k][i][j]['code'] + ' (' + schedtype_map[schedule[k][i][j]['type']] + ')<br>';
                 }

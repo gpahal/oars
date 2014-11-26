@@ -86,8 +86,6 @@
     </style>
 {% endblock %}
 
-{% block courses-offered-class %}active{% endblock %}
-
 {% block heading %}Mailing list{% endblock %}
 
 {% block heading-small %}
@@ -97,6 +95,8 @@
 {% block relative-address %}
     <li class="active">Mailing list</li>
 {% endblock %}
+
+{% block mailing-list-class %}active{% endblock %}
 
 {% block content %}
     <form role="form" name="mailing_list_form" action="{% url 'professor:mailing_list' %}" method="post"

@@ -16,6 +16,12 @@
             <span>Courses offered</span>
         </a>
     </li>
+    <li class="{% block mailing-list-class %}{% endblock %}">
+        <a href="{% url 'professor:mailing_list' %}">
+            <span class="fa fa-envelope"></span>
+            <span>Mailing list</span>
+        </a>
+    </li>
     <li class="treeview {% block courses-class %}{% endblock %}">
         <a href="#">
             <span class="fa fa-list"></span>
