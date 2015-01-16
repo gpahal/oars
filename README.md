@@ -42,22 +42,3 @@ Other facilities can be explored easily using the interface once you are logged 
 ### Site email
 
 - email: oars.django@gmail.com
-- passsword: django.oars
-
-### Users
-
-- Admins
-    - admin
-
-- Students
-    - student1
-    - student2
-
-- Professors
-    - prof1
-    - prof2
-
-- DUGC's
-    - dugc1
-
-Passwords are the same as usernames for all the users.
